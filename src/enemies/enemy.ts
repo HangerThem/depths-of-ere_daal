@@ -44,7 +44,7 @@ export class Enemy implements EnemyObject {
       maxHealth: hp,
       speed: 2,
       knockbackResistance: 0.5,
-      aggroRange: 200,
+      aggroRange: 500,
       pathUpdateDelay: 1000,
       waypointThreshold: 5,
       path: null,

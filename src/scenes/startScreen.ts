@@ -51,7 +51,7 @@ export class StartScreen extends Scene {
   }
 
   generateLevel() {
-    const tileSize = 50
+    const tileSize = 32
     const bgColors = ["#313131", "#333333", "#353535", "#373737"]
     const {
       x: px,
