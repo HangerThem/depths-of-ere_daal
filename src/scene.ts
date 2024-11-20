@@ -6,7 +6,7 @@ import {
   ObstacleLayer,
   EnemyLayer,
 } from "./layer.js"
-import { Player } from "./player.js"
+import { Player } from "./gameObjects/player.js"
 import { Target } from "./types/camera.js"
 import { IScene, SceneBounds } from "./types/scene"
 import { GameState } from "./types/game.js"

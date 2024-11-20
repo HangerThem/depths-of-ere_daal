@@ -1,5 +1,5 @@
-import { BaseGameObject } from "./base"
-import { GameState } from "./game"
+import { BaseGameObject } from "../base"
+import { GameState } from "../game"
 
 export interface PlayerConstructorParams {
   x: number
@@ -10,7 +10,7 @@ export interface PlayerConstructorParams {
   gameState: GameState
 }
 
-export interface PlayerObject extends BaseGameObject {
+export interface IPlayer extends BaseGameObject {
   speed: number
   gameState: GameState
 

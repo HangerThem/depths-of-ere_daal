@@ -1,9 +1,9 @@
-import { BaseGameObject } from "./types/base"
-import { ObstacleObject } from "./types/obstacle"
-import { PlayerConstructorParams, PlayerObject } from "./types/player"
-import { GameState } from "./types/game"
+import { BaseGameObject } from "../types/base"
+import { ObstacleObject } from "../types/obstacle"
+import { GameState } from "../types/game"
+import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player"
 
-export class Player implements PlayerObject {
+export class Player implements IPlayer {
   x: number
   y: number
   vx: number

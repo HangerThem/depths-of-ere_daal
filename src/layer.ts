@@ -5,7 +5,6 @@ import {
   IObstacleLayer,
   IPlayerLayer,
   INPCLayer,
-  IUILayer,
 } from "./types/layer"
 import { BaseGameObject } from "./types/base"
 import { EnemyObject } from "./types/enemy"
@@ -15,22 +14,21 @@ import { Tile } from "./types/tile"
 import { GameState } from "./types/game.js"
 import { IProjectile } from "./types/weapon"
 import { NPCObject } from "./types/npc.js"
-import { Player } from "./player.js"
 
-export class Layer {
+export class Layer<T extends BaseGameObject> {
   protected ctx: CanvasRenderingContext2D
-  public objects: BaseGameObject[]
+  public objects: T[]
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx
     this.objects = []
   }
 
-  addObject(object: BaseGameObject): void {
+  addObject(object: T): void {
     this.objects.push(object)
   }
 
-  removeObject(object: BaseGameObject): void {
+  removeObject(object: T): void {
     const index = this.objects.indexOf(object)
     if (index > -1) {
       this.objects.splice(index, 1)
@@ -50,7 +48,7 @@ export class Layer {
   }
 }
 
-export class ProjectileLayer extends Layer implements IProjectileLayer {
+export class ProjectileLayer extends Layer<IProjectile> implements IProjectileLayer {
   public objects: IProjectile[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -70,7 +68,7 @@ export class ProjectileLayer extends Layer implements IProjectileLayer {
   }
 }
 
-export class EnemyLayer extends Layer implements IEnemyLayer {
+export class EnemyLayer extends Layer<EnemyObject> implements IEnemyLayer {
   public objects: EnemyObject[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -88,7 +86,7 @@ export class EnemyLayer extends Layer implements IEnemyLayer {
   }
 }
 
-export class PlayerLayer extends Layer implements IPlayerLayer {
+export class PlayerLayer extends Layer<PlayerObject> implements IPlayerLayer {
   private gameState: GameState
 
   constructor(gameState: GameState) {
@@ -113,7 +111,7 @@ export class PlayerLayer extends Layer implements IPlayerLayer {
   }
 }
 
-export class NPCLayer extends Layer implements INPCLayer {
+export class NPCLayer extends Layer<NPCObject> implements INPCLayer {
   public objects: NPCObject[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -130,7 +128,7 @@ export class NPCLayer extends Layer implements INPCLayer {
   }
 }
 
-export class BackgroundLayer extends Layer implements BackgroundLayer {
+export class BackgroundLayer extends Layer<Tile> implements BackgroundLayer {
   public objects: Tile[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -147,7 +145,7 @@ export class BackgroundLayer extends Layer implements BackgroundLayer {
   }
 }
 
-export class ObstacleLayer extends Layer implements IObstacleLayer {
+export class ObstacleLayer extends Layer<ObstacleObject> implements IObstacleLayer {
   public objects: ObstacleObject[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -182,11 +180,10 @@ export class ObstacleLayer extends Layer implements IObstacleLayer {
   }
 }
 
-export class UILayer extends Layer implements IUILayer {
+export class UILayer  {
   public dialogSystem: DialogSystem
 
   constructor(ctx: CanvasRenderingContext2D) {
-    super(ctx)
     this.dialogSystem = new DialogSystem({ ctx, canvas: ctx.canvas })
   }
 

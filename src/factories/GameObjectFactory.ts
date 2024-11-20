@@ -1,4 +1,4 @@
-import { Player } from "../player.js"
+import { Player } from "../gameObjects/player.js"
 import { Enemy } from "../enemies/enemy.js"
 import { NPC } from "../npc.js"
 import { Obstacle } from "../obstacle.js"
@@ -7,15 +7,16 @@ import { DialogSystem } from "../dialog.js"
 import { NPCConstructorParams } from "../types/npc.js"
 import { ObstacleConstructorParams } from "../types/obstacle.js"
 import { EnemyConstructorParams } from "../types/enemy.js"
-import { PlayerConstructorParams } from "../types/player.js"
+import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player.js"
 import { TileConstructorParams } from "../types/tile.js"
 import { DialogSystemConstructorParams } from "../types/dialogSystem.js"
+import { IGameObjectFactory } from "../types/factories/IGameObjectFactory.js"
 
 /**
  * A factory class for creating various game objects.
  * This class follows the Singleton design pattern.
  */
-class GameObjectFactory {
+class GameObjectFactory implements IGameObjectFactory {
   private static instance: GameObjectFactory
 
   private constructor() {}
@@ -33,23 +34,11 @@ class GameObjectFactory {
 
   /**
    * Creates a new Player object.
-   * @param x - The x-coordinate of the player.
-   * @param y - The y-coordinate of the player.
-   * @param width - The width of the player.
-   * @param height - The height of the player.
-   * @param color - The color of the player.
-   * @param gameState - The game state associated with the player.
+   * @param params - The parameters to create the player.
    * @returns A new Player object.
    */
-  public createPlayer({
-    x,
-    y,
-    width,
-    height,
-    color,
-    gameState,
-  }: PlayerConstructorParams): Player {
-    return new Player({ x, y, width, height, color, gameState })
+  public createPlayer(params: PlayerConstructorParams): IPlayer {
+    return new Player(params)
   }
 
   /**
