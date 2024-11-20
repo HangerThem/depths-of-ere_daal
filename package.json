@@ -1,0 +1,12 @@
+{
+  "name": "depths-of-ere_daal",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
