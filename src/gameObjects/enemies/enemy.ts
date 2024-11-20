@@ -3,11 +3,11 @@ import {
   EnemyState,
   EnemyConfig,
   EnemyConstructorParams,
-} from "../types/enemy"
-import { GameState } from "../types/game"
-import { ObstacleObject } from "../types/obstacle"
-import { PathFinder } from "../pathfinder.js"
-import { Point } from "../types/pathfinder"
+} from "../../types/gameObjects/enemies/enemy"
+import { GameState } from "../../types/core/gameState"
+import { ObstacleObject } from "../../types/obstacle"
+import { PathFinder } from "../../pathfinder.js"
+import { Point } from "../../types/pathfinder"
 
 export class Enemy implements EnemyObject {
   x: number

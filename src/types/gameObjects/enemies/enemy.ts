@@ -1,7 +1,6 @@
-import { Point } from "./pathfinder"
-import { BaseGameObject } from "./base"
-import { GameState } from "./game"
-import { PathFinder } from "../pathfinder"
+import { BaseGameObject } from "../../base"
+import { GameState } from "../../core/gameState"
+import { IPathFinder, Point } from "../../pathfinder"
 
 export interface EnemyState {
   position: Point
@@ -15,7 +14,7 @@ export interface EnemyState {
 export interface EnemyConfig {
   id: string
   startPosition: Point
-  pathFinder: PathFinder
+  pathFinder: IPathFinder
   maxHealth: number
   speed: number
   knockbackResistance: number
@@ -35,7 +34,7 @@ export interface EnemyConstructorParams {
   gameState: GameState
 }
 
-export interface EnemyObject extends BaseGameObject {
+export interface IEnemy extends BaseGameObject {
   enemyState: EnemyState
   enemyConfig: EnemyConfig
   gameState: GameState

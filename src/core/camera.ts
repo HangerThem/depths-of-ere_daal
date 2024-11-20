@@ -1,14 +1,15 @@
-import { SceneBounds } from "./types/scene"
+import { ICamera } from "../types/core/camera"
+import { SceneBounds } from "../types/scene"
 
 /**
  * Manages the camera position, zoom level, and screen shake effects.
  * Uses the Singleton pattern to ensure only one instance is created.
  */
-class Camera {
+class Camera implements ICamera {
   private static instance: Camera | null = null
 
-  private x: number = 0
-  private y: number = 0
+  private _x: number = 0
+  private _y: number = 0
   private targetX: number = 0
   private targetY: number = 0
   private bounds: SceneBounds = {
@@ -75,16 +76,16 @@ class Camera {
    * Gets the X position of the camera.
    * @returns The X coordinate of the camera.
    */
-  public getX(): number {
-    return this.x
+  get x(): number {
+    return this._x
   }
 
   /**
    * Gets the Y position of the camera.
    * @returns The Y coordinate of the camera.
    */
-  public getY(): number {
-    return this.y
+  get y(): number {
+    return this._y
   }
 
   /**
@@ -106,8 +107,8 @@ class Camera {
       Math.min(this.targetY, this.bounds.height - this.canvas.height)
     )
 
-    this.x = Math.round(this.targetX)
-    this.y = Math.round(this.targetY)
+    this._x = Math.round(this.targetX)
+    this._y = Math.round(this.targetY)
   }
 
   /**
@@ -118,8 +119,8 @@ class Camera {
    */
   public getScreenPosition(worldX: number, worldY: number) {
     return {
-      x: worldX - this.x,
-      y: worldY - this.y,
+      x: worldX - this._x,
+      y: worldY - this._y,
     }
   }
 
@@ -168,7 +169,7 @@ class Camera {
    */
   public apply(ctx: CanvasRenderingContext2D): void {
     ctx.save()
-    ctx.translate(-this.x, -this.y)
+    ctx.translate(-this._x, -this._y)
     ctx.scale(this.zoomLevel, this.zoomLevel)
     if (this.isShaking) {
       const shakeX = (Math.random() * 2 - 1) * this.shakeMagnitude
@@ -182,8 +183,8 @@ class Camera {
    */
   public update(deltaTime: number): void {
     const smoothingFactor = 0.1
-    this.x += (this.targetX - this.x) * smoothingFactor
-    this.y += (this.targetY - this.y) * smoothingFactor
+    this._x += (this.targetX - this._x) * smoothingFactor
+    this._y += (this.targetY - this._y) * smoothingFactor
 
     if (this.isShaking) {
       this.shakeElapsed += deltaTime

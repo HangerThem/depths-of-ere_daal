@@ -11,7 +11,7 @@ import { EnemyObject } from "./types/enemy"
 import { ObstacleObject } from "./types/obstacle"
 import { PlayerObject } from "./types/player"
 import { Tile } from "./types/tile"
-import { GameState } from "./types/game.js"
+import { GameState } from "./types/core/gameState.js"
 import { IProjectile } from "./types/weapon"
 import { NPCObject } from "./types/npc.js"
 
@@ -48,7 +48,10 @@ export class Layer<T extends BaseGameObject> {
   }
 }
 
-export class ProjectileLayer extends Layer<IProjectile> implements IProjectileLayer {
+export class ProjectileLayer
+  extends Layer<IProjectile>
+  implements IProjectileLayer
+{
   public objects: IProjectile[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -145,7 +148,10 @@ export class BackgroundLayer extends Layer<Tile> implements BackgroundLayer {
   }
 }
 
-export class ObstacleLayer extends Layer<ObstacleObject> implements IObstacleLayer {
+export class ObstacleLayer
+  extends Layer<ObstacleObject>
+  implements IObstacleLayer
+{
   public objects: ObstacleObject[]
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -180,7 +186,7 @@ export class ObstacleLayer extends Layer<ObstacleObject> implements IObstacleLay
   }
 }
 
-export class UILayer  {
+export class UILayer {
   public dialogSystem: DialogSystem
 
   constructor(ctx: CanvasRenderingContext2D) {

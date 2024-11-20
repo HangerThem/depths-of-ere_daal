@@ -1,6 +1,6 @@
 import { BaseGameObject } from "../types/base"
 import { ObstacleObject } from "../types/obstacle"
-import { GameState } from "../types/game"
+import { GameState } from "../types/core/gameState"
 import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player"
 
 export class Player implements IPlayer {

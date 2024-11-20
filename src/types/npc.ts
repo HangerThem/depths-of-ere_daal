@@ -1,6 +1,6 @@
 import { BaseGameObject } from "./base"
 import { Dialog } from "./dialog"
-import { GameState } from "./game"
+import { GameState } from "./core/gameState"
 import { PlayerObject } from "./player"
 
 export interface NPCObject extends BaseGameObject {

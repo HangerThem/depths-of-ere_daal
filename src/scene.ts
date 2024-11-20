@@ -7,9 +7,9 @@ import {
   EnemyLayer,
 } from "./layer.js"
 import { Player } from "./gameObjects/player.js"
-import { Target } from "./types/camera.js"
+import { Target } from "./types/core/camera.js"
 import { IScene, SceneBounds } from "./types/scene"
-import { GameState } from "./types/game.js"
+import { GameState } from "./types/core/gameState.js"
 
 export class Scene implements IScene {
   protected gameState: GameState

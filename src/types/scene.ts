@@ -1,7 +1,5 @@
-import { Camera } from "../camera"
-import { Target } from "./camera"
+import { Target } from "./core/camera"
 import { Scene } from "../scene"
-import { GameState } from "./game"
 
 export interface SceneBounds {
   x: number
@@ -21,6 +19,7 @@ export interface IScene {
 }
 
 export interface ISceneManager {
+  currentScene: IScene | null
   addScene(name: string, scene: Scene): void
   switchToScene(name: string): void
   update(): void

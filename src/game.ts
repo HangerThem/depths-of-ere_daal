@@ -1,14 +1,14 @@
-import { Camera } from "./camera.js"
+import { Camera } from "./core/camera.js"
 import { DialogSystem } from "./dialog.js"
 import { gameObjectFactory } from "./factories/GameObjectFactory.js"
 import { SceneManager } from "./sceneManager.js"
 import { StartScreen } from "./scenes/startScreen.js"
-import { GameState } from "./types/game.js"
+import { IGameState } from "./types/core/gameState.js"
 
 class Game {
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
-  private gameState: GameState
+  private gameState: IGameState
   public sceneManager: SceneManager
 
   private animationFrameId: number | null = null

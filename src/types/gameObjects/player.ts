@@ -1,5 +1,5 @@
 import { BaseGameObject } from "../base"
-import { GameState } from "../game"
+import { GameState } from "../core/gameState"
 
 export interface PlayerConstructorParams {
   x: number

@@ -1,4 +1,4 @@
-import { GameState } from "./types/game"
+import { GameState } from "./types/core/gameState"
 import { NPCObject, NPCConstructorParams } from "./types/npc"
 import { PlayerObject } from "./types/player"
 

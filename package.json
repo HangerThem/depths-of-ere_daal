@@ -2,6 +2,13 @@
   "name": "depths-of-ere_daal",
   "version": "1.0.0",
   "type": "module",
+  "author": "HangerThem",
+  "license": "MIT",
+  "description": "A web-based adventure game",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HangerThem/depths-of-ere_daal.git"
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w"

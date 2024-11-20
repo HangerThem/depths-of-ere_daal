@@ -10,3 +10,7 @@ export interface PathData {
   currentWaypointIndex: number
   lastUpdate: number
 }
+
+export interface IPathFinder {
+  findPath(start: Point, end: Point): PathData
+}

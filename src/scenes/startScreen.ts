@@ -1,6 +1,6 @@
 import { Scene } from "../scene.js"
 import { Controls } from "../controls.js"
-import { GameState } from "../types/game.js"
+import { GameState } from "../types/core/gameState.js"
 import { gameObjectFactory } from "../factories/GameObjectFactory.js"
 
 export class StartScreen extends Scene {

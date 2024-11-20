@@ -1,5 +1,5 @@
 import { Player } from "../gameObjects/player.js"
-import { Enemy } from "../enemies/enemy.js"
+import { Enemy } from "../gameObjects/enemies/enemy.js"
 import { NPC } from "../npc.js"
 import { Obstacle } from "../obstacle.js"
 import { Tile } from "../tile.js"
@@ -7,7 +7,10 @@ import { DialogSystem } from "../dialog.js"
 import { NPCConstructorParams } from "../types/npc.js"
 import { ObstacleConstructorParams } from "../types/obstacle.js"
 import { EnemyConstructorParams } from "../types/enemy.js"
-import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player.js"
+import {
+  IPlayer,
+  PlayerConstructorParams,
+} from "../types/gameObjects/player.js"
 import { TileConstructorParams } from "../types/tile.js"
 import { DialogSystemConstructorParams } from "../types/dialogSystem.js"
 import { IGameObjectFactory } from "../types/factories/IGameObjectFactory.js"

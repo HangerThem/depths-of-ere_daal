@@ -1,5 +1,5 @@
 import { TileConstructorParams } from "../tile";
-import { EnemyConstructorParams } from "../enemy";
+import { IEnemy, EnemyConstructorParams } from "../enemy";
 import { ObstacleConstructorParams } from "../obstacle";
 import { NPCConstructorParams } from "../npc";
 import { DialogSystemConstructorParams } from "../dialogSystem";

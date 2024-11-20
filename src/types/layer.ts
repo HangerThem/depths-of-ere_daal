@@ -1,6 +1,6 @@
 import { BaseGameObject } from "./base"
 import { EnemyObject } from "./enemy"
-import { Target } from "./camera"
+import { Target } from "./core/camera"
 import { ObstacleObject } from "./obstacle"
 import { PlayerObject } from "./player"
 
