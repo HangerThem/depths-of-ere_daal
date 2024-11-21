@@ -1,3 +1,5 @@
+import { IObstacle } from "./obstacle"
+
 export interface Point {
   x: number
   y: number
@@ -12,5 +14,5 @@ export interface PathData {
 }
 
 export interface IPathFinder {
-  findPath(start: Point, end: Point): PathData
+  findPath(start: Point, end: Point, obstacles: Set<IObstacle>): Point[] | null
 }

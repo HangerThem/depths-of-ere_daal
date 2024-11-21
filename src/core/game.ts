@@ -2,6 +2,7 @@ import { IGame } from "../types/core/game"
 import { StartScreen } from "../scenes/startScreen.js"
 import { IGameState } from "../types/core/gameState.js"
 import { GameState } from "./gameState.js"
+import { CanvasInitializationError } from "../errors/RenderingErrors.js"
 
 /**
  * The main game class.
@@ -18,12 +19,11 @@ class Game implements IGame {
    * @throws Error if the canvas element with ID 'gameCanvas' is not found
    * @throws Error if the canvas element is not an HTMLCanvasElement
    */
-  constructor() {
-    const canvasElement = document.getElementById("gameCanvas")
-    if (!(canvasElement instanceof HTMLCanvasElement)) {
-      throw new Error("Canvas element with ID 'gameCanvas' not found.")
+  constructor(canvas: HTMLCanvasElement) {
+    if (!canvas) {
+      throw new CanvasInitializationError("Canvas element not found")
     }
-    this._canvas = canvasElement
+    this._canvas = canvas
     this._ctx = this._canvas.getContext("2d") as CanvasRenderingContext2D
 
     this._canvas.width = window.innerWidth
@@ -79,5 +79,6 @@ class Game implements IGame {
   }
 }
 
-const game = new Game()
+const canvasElement = document.getElementById("gameCanvas") as HTMLCanvasElement
+const game = new Game(canvasElement)
 game.start()

@@ -1,8 +1,7 @@
 import { BaseGameObject } from "../../base"
 import { IPathFinder, Point } from "../../pathfinder"
 
-export interface EnemyState {
-  position: Point
+export interface IEnemyState {
   health: number
   dead: boolean
   isAggressive: boolean
@@ -10,7 +9,7 @@ export interface EnemyState {
   target?: Point
 }
 
-export interface EnemyConfig {
+export interface IEnemyConfig {
   id: string
   startPosition: Point
   pathFinder: IPathFinder
@@ -33,6 +32,6 @@ export interface EnemyConstructorParams {
 }
 
 export interface IEnemy extends BaseGameObject {
-  enemyState: EnemyState
-  enemyConfig: EnemyConfig
+  enemyState: IEnemyState
+  enemyConfig: IEnemyConfig
 }

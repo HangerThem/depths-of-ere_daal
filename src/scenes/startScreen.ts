@@ -16,7 +16,7 @@ export class StartScreen extends Scene {
     this.generateLevel()
     this.addControls()
     this.addNPCs()
-    // this.generateEnemies()
+    this.generateEnemies()
   }
 
   addNPCs() {

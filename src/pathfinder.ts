@@ -1,7 +1,7 @@
-import { Node, PathData, Point } from "./types/pathfinder"
-import { ObstacleObject } from "./types/obstacle"
+import { IPathFinder, Node, PathData, Point } from "./types/pathfinder"
+import { IObstacle } from "./types/obstacle"
 
-export class PathFinder {
+export class PathFinder implements IPathFinder {
   private readonly gridSize: number
   private entityPaths: Map<string, PathData>
 
@@ -14,7 +14,7 @@ export class PathFinder {
     entityId: string,
     start: Point,
     end: Point,
-    obstacles: ObstacleObject[] | Set<ObstacleObject>
+    obstacles: Set<IObstacle>
   ): void {
     const path = this.findPath(start, end, obstacles)
     if (path) {
@@ -53,7 +53,7 @@ export class PathFinder {
   findPath(
     start: Point,
     end: Point,
-    obstacles: ObstacleObject[] | Set<ObstacleObject>
+    obstacles: Set<IObstacle>
   ): Point[] | null {
     const startPos = {
       x: start.x || 0,
@@ -145,10 +145,7 @@ export class PathFinder {
     })
   }
 
-  private getNeighbors(
-    node: Node,
-    obstacles: ObstacleObject[] | Set<ObstacleObject>
-  ): Node[] {
+  private getNeighbors(node: Node, obstacles: Set<IObstacle>): Node[] {
     const directions = [
       { x: 0, y: 1 },
       { x: 1, y: 0 },
@@ -189,10 +186,7 @@ export class PathFinder {
     return neighbors
   }
 
-  private isColliding(
-    point: Point,
-    obstacles: ObstacleObject[] | Set<ObstacleObject> | null
-  ): boolean {
+  private isColliding(point: Point, obstacles: Set<IObstacle> | null): boolean {
     if (!obstacles) return false
     const obstacleArray = Array.isArray(obstacles)
       ? obstacles
