@@ -1,19 +1,20 @@
-import { BaseGameObject } from "../types/base"
-import { ObstacleObject } from "../types/obstacle"
-import { GameState } from "../types/core/gameState"
+import { GameState } from "../core/gameState.js"
+import { BaseGameObject, Bounds } from "../types/base"
+import { IGameState } from "../types/core/gameState.js"
 import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player"
+import { IObstacle } from "../types/obstacle"
 
 export class Player implements IPlayer {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  rotation: number
-  width: number
-  height: number
-  color: string
-  speed: number
-  gameState: GameState
+  private _x: number
+  private _y: number
+  private _vx: number
+  private _vy: number
+  private _rotation: number
+  private _width: number
+  private _height: number
+  private _color: string
+  private _speed: number
+  private _gameState: IGameState
 
   constructor({
     x,
@@ -23,19 +24,39 @@ export class Player implements IPlayer {
     color,
     gameState,
   }: PlayerConstructorParams) {
-    this.x = x
-    this.y = y
-    this.vx = 0
-    this.vy = 0
-    this.rotation = 0
-    this.width = width
-    this.height = height
-    this.color = color
-    this.gameState = gameState
-    this.speed = 2
+    this._x = x
+    this._y = y
+    this._vx = 0
+    this._vy = 0
+    this._rotation = 0
+    this._width = width
+    this._height = height
+    this._color = color
+    this._gameState = gameState
+    this._speed = 2
   }
 
-  private isColliding(a: BaseGameObject, b: BaseGameObject): boolean {
+  get x(): number {
+    return this._x
+  }
+
+  get y(): number {
+    return this._y
+  }
+
+  get width(): number {
+    return this._width
+  }
+
+  get height(): number {
+    return this._height
+  }
+
+  get color(): string {
+    return this._color
+  }
+
+  private isColliding(a: Bounds, b: Bounds): boolean {
     return (
       a.x < b.x + b.width &&
       a.x + a.width > b.x &&
@@ -45,87 +66,79 @@ export class Player implements IPlayer {
   }
 
   public draw(): void {
-    this.gameState.ctx.fillStyle = this.color
-    this.gameState.ctx.save()
+    this._gameState.draw((ctx) => {
+      ctx.fillStyle = this._color
+      ctx.save()
 
-    this.gameState.ctx.translate(
-      this.x + this.width / 2,
-      this.y + this.height / 2
-    )
-    this.gameState.ctx.rotate((this.rotation * Math.PI) / 180)
-    this.gameState.ctx.translate(
-      -(this.x + this.width / 2),
-      -(this.y + this.height / 2)
-    )
+      ctx.translate(this._x + this._width / 2, this._y + this._height / 2)
+      ctx.rotate((this._rotation * Math.PI) / 180)
+      ctx.translate(-(this._x + this._width / 2), -(this._y + this._height / 2))
 
-    this.gameState.ctx.fillRect(this.x, this.y, this.width, this.height)
+      ctx.fillRect(this._x, this._y, this._width, this._height)
 
-    this.gameState.ctx.restore()
+      ctx.restore()
+    })
   }
 
   public moveUp(): void {
-    this.vy = -this.speed
+    this._vy = -this._speed
   }
 
   public moveDown(): void {
-    this.vy = this.speed
+    this._vy = this._speed
   }
 
   public moveLeft(): void {
-    this.vx = -this.speed
+    this._vx = -this._speed
   }
 
   public moveRight(): void {
-    this.vx = this.speed
+    this._vx = this._speed
   }
 
   public stopVertical(): void {
-    this.vy = 0
+    this._vy = 0
   }
 
   public stopHorizontal(): void {
-    this.vx = 0
+    this._vx = 0
   }
 
-  public updatePosition(obstacles: ObstacleObject[] = []): void {
-    const nextX = this.x + this.vx
-    const nextY = this.y + this.vy
-
-    const nextPos = {
-      x: nextX,
-      y: nextY,
-      width: this.width,
-      height: this.height,
-    }
+  public updatePosition(obstacles: Set<IObstacle>): void {
+    const nextX = this._x + this._vx
+    const nextY = this._y + this._vy
 
     let canMoveX = true
     let canMoveY = true
 
     if (
-      nextX < this.gameState.currentScene.sceneBounds.x ||
-      nextX + this.width > this.gameState.currentScene.sceneBounds.width
+      nextX < this._gameState.sceneManager.currentScene?.bounds.x!! ||
+      nextX + this._width >
+        this._gameState.sceneManager.currentScene?.bounds.width!!
     ) {
       canMoveX = false
     }
     if (
-      nextY < this.gameState.currentScene.sceneBounds.y ||
-      nextY + this.height > this.gameState.currentScene.sceneBounds.height
+      nextY < this._gameState.sceneManager.currentScene?.bounds.y!! ||
+      nextY + this._height >
+        this._gameState.sceneManager.currentScene?.bounds.height!!
     ) {
       canMoveY = false
     }
 
     for (const obstacle of obstacles) {
-      const checkX: BaseGameObject = {
-        ...nextPos,
-        y: this.y,
-        color: this.color,
-        draw: () => {},
+      const checkX = {
+        x: nextX,
+        y: this._y,
+        width: this._width,
+        height: this._height,
       }
-      const checkY: BaseGameObject = {
-        ...nextPos,
-        x: this.x,
-        color: this.color,
-        draw: () => {},
+
+      const checkY = {
+        x: this._x,
+        y: nextY,
+        width: this._width,
+        height: this._height,
       }
 
       if (this.isColliding(checkX, obstacle)) canMoveX = false
@@ -133,27 +146,27 @@ export class Player implements IPlayer {
     }
 
     if (canMoveX) {
-      this.x = nextX
+      this._x = nextX
     }
     if (canMoveY) {
-      this.y = nextY
+      this._y = nextY
     }
   }
 
   public rotateToCursor(mouseX: number, mouseY: number): void {
-    const camera = this.gameState.camera
+    const camera = this._gameState.camera
     if (!camera) return
 
-    const centerX = this.x + this.width / 2
-    const centerY = this.y + this.height / 2
+    const centerX = this._x + this._width / 2
+    const centerY = this._y + this._height / 2
     const screenPos = camera.getScreenPosition(centerX, centerY)
 
     const dx = mouseX - screenPos.x
     const dy = mouseY - screenPos.y
-    this.rotation = (Math.atan2(dy, dx) * 180) / Math.PI
+    this._rotation = (Math.atan2(dy, dx) * 180) / Math.PI
   }
 
-  public update(obstacles: ObstacleObject[]): void {
+  public update(obstacles: Set<IObstacle>): void {
     this.updatePosition(obstacles)
     this.draw()
   }

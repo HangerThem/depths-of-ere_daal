@@ -4,7 +4,7 @@ import {
   EnemyConfig,
   EnemyConstructorParams,
 } from "../../types/gameObjects/enemies/enemy"
-import { GameState } from "../../types/core/gameState"
+import { GameState } from "../../types/core/gameState.js"
 import { ObstacleObject } from "../../types/obstacle"
 import { PathFinder } from "../../pathfinder.js"
 import { Point } from "../../types/pathfinder"

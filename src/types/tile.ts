@@ -6,7 +6,6 @@ export interface TileConstructorParams {
   width: number
   height: number
   color: string
-  ctx: CanvasRenderingContext2D
 }
 
-export interface Tile extends BaseGameObject {}
+export interface ITile extends BaseGameObject {}

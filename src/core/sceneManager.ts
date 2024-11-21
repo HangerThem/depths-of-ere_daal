@@ -1,31 +1,35 @@
-import { Scene } from "./scene"
-import { ISceneManager } from "./types/scene"
+import {
+  CanvasCtxInitializationError,
+  SceneAlreadyExistsError,
+} from "../errors/RenderingErrors.js"
+import {
+  ISceneManager,
+  SceneManagerConstructorParams,
+} from "../types/core/sceneManager.js"
+import { IScene } from "../types/scene"
 
 /**
  * Manages game scenes using the Singleton pattern.
  * Handles scene switching, updating, and maintaining the game's rendering context.
  */
-class SceneManager implements ISceneManager {
-  private static instance: SceneManager
+export class SceneManager implements ISceneManager {
+  private static instance: ISceneManager | null = null
 
-  private ctx: CanvasRenderingContext2D
-  private canvas: HTMLCanvasElement
-  private currentScene: Scene | null
-  private scenes: Map<string, Scene>
+  private _ctx: CanvasRenderingContext2D
+  private _canvas: HTMLCanvasElement
+  private _scenes: Map<string, IScene>
+  public currentScene: IScene | null
 
   /**
    * Private constructor to enforce Singleton pattern
    * @param ctx - The 2D rendering context
    * @param canvas - The canvas element
    */
-  private constructor(
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ) {
-    this.ctx = ctx
-    this.canvas = canvas
+  private constructor({ ctx, canvas }: SceneManagerConstructorParams) {
+    this._ctx = ctx
+    this._canvas = canvas
+    this._scenes = new Map<string, IScene>()
     this.currentScene = null
-    this.scenes = new Map<string, Scene>()
   }
 
   /**
@@ -38,14 +42,12 @@ class SceneManager implements ISceneManager {
   public static getInstance(
     ctx?: CanvasRenderingContext2D,
     canvas?: HTMLCanvasElement
-  ): SceneManager {
+  ): ISceneManager {
     if (!SceneManager.instance) {
       if (!ctx || !canvas) {
-        throw new Error(
-          "Canvas rendering context and canvas must be provided for the first initialization."
-        )
+        throw new CanvasCtxInitializationError()
       }
-      SceneManager.instance = new SceneManager(ctx, canvas)
+      SceneManager.instance = new SceneManager({ ctx, canvas })
     }
     return SceneManager.instance
   }
@@ -54,27 +56,39 @@ class SceneManager implements ISceneManager {
    * Registers a new scene with the manager
    * @param name - Unique identifier for the scene
    * @param scene - The scene instance to register
+   * @throws Error if a scene with the same name already exists
    */
-  public addScene(name: string, scene: Scene): void {
-    this.scenes.set(name, scene)
+  public addScene(name: string, scene: IScene): void {
+    // if (this._scenes.has(name)) {
+    //   throw new SceneAlreadyExistsError(name)
+    // }
+
+    this._scenes.set(name, scene)
+  }
+
+  /**
+   * Removes all scenes from the manager
+   */
+  public clearScenes(): void {
+    this._scenes.clear()
   }
 
   /**
    * Switches to a different scene
    * @param name - Name of the scene to switch to
    * @param data - Optional data to pass to the new scene
+   * @throws Error if the scene with the given name does not exist
    * @remarks Clears the canvas, exits the current scene, and enters the new scene
    */
   public switchToScene(name: string, data: any = null): void {
     const prevScene = this.currentScene
-    const newScene = this.scenes.get(name)
+    const newScene = this._scenes.get(name)
 
     if (!newScene) {
-      console.error(`Scene ${name} does not exist`)
-      return
+      throw new Error(`Scene with name '${name}' not found.`)
     }
 
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height)
     if (prevScene) {
       prevScene.exit()
     }
@@ -84,7 +98,11 @@ class SceneManager implements ISceneManager {
     try {
       this.currentScene.enter(data)
     } catch (error) {
-      console.error("Error switching to scene:", error)
+      console.error(error)
+      this.currentScene = prevScene
+      if (prevScene) {
+        prevScene.enter()
+      }
     }
   }
 
@@ -92,11 +110,9 @@ class SceneManager implements ISceneManager {
    * Updates the current scene
    * Called every frame to update game logic
    */
-  update() {
+  public update() {
     if (this.currentScene) {
       this.currentScene.update()
     }
   }
 }
-
-export { SceneManager }

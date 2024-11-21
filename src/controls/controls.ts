@@ -1,6 +1,7 @@
-import { Scene } from "./scene"
-import { DialogSystem } from "./dialog"
-import { PlayerObject } from "./types/player"
+import { GameState } from "../core/gameState.js"
+import { DialogSystem } from "../dialog.js"
+import { IPlayer } from "../types/gameObjects/player"
+import { IScene } from "../types/scene"
 
 /**
  * Class for handling player movement controls
@@ -11,20 +12,21 @@ export class Controls {
    * @param player Player object to add controls to
    * @returns Function to remove controls
    */
-  static addMovementControls(player: PlayerObject): () => void {
+  static addMovementControls(player: IPlayer): () => void {
+    const gameState = GameState.getInstance()
     const keyDownHandler = (e: KeyboardEvent) => {
       switch (e.key.toLowerCase()) {
         case "w":
-          player.moveUp()
+          gameState.withPlayer((player) => player.moveUp())
           break
         case "s":
-          player.moveDown()
+          gameState.withPlayer((player) => player.moveDown())
           break
         case "a":
-          player.moveLeft()
+          gameState.withPlayer((player) => player.moveLeft())
           break
         case "d":
-          player.moveRight()
+          gameState.withPlayer((player) => player.moveRight())
           break
       }
     }
@@ -33,17 +35,19 @@ export class Controls {
       switch (e.key.toLowerCase()) {
         case "w":
         case "s":
-          player.stopVertical()
+          gameState.withPlayer((player) => player.stopVertical())
           break
         case "a":
         case "d":
-          player.stopHorizontal()
+          gameState.withPlayer((player) => player.stopHorizontal())
           break
       }
     }
 
     const mouseMoveHandler = (e: MouseEvent) => {
-      player.rotateToCursor(e.clientX, e.clientY)
+      gameState.withPlayer((player) =>
+        player.rotateToCursor(e.clientX, e.clientY)
+      )
     }
 
     document.addEventListener("mousemove", mouseMoveHandler)
@@ -95,19 +99,20 @@ export class Controls {
    * @param scene Scene to add controls to
    * @returns Function to remove controls
    */
-  static addInteractionControls(scene: Scene): () => void {
+  static addInteractionControls(scene: IScene): () => void {
     const keyDownHandler = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "e") {
-        const nearbyNPC = scene.NPCLayer?.objects.find(
+        const nearbyNPC = Array.from(scene.layers.npcs?.objects || []).find(
           (npc) => npc.playerInRange
         )
         if (nearbyNPC) {
           const dialog = nearbyNPC.interact()
           if (dialog) {
+            const gameState = GameState.getInstance()
             const showNextDialog = (choiceIndex: number) => {
               const nextDialog = nearbyNPC.processChoice(choiceIndex)
               if (nextDialog) {
-                scene.uiLayer.dialogSystem.show({
+                gameState.dialogSystem.show({
                   text: nextDialog.text,
                   choices: nextDialog.choices?.map((c) => c.text),
                   callback: showNextDialog,
@@ -116,7 +121,7 @@ export class Controls {
               }
             }
 
-            scene.uiLayer.dialogSystem.show({
+            gameState.dialogSystem.show({
               text: dialog.text,
               choices: dialog.choices?.map((c) => c.text),
               callback: showNextDialog,

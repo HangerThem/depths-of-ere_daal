@@ -5,69 +5,66 @@ import {
   UILayer,
   ObstacleLayer,
   EnemyLayer,
+  ProjectileLayer,
 } from "./layer.js"
-import { Player } from "./gameObjects/player.js"
 import { Target } from "./types/core/camera.js"
-import { IScene, SceneBounds } from "./types/scene"
-import { GameState } from "./types/core/gameState.js"
+import { IScene, LayerMap, SceneBounds } from "./types/scene"
+import { IGameState } from "./types/core/gameState.js"
+import { GameState } from "./core/gameState.js"
 
-export class Scene implements IScene {
-  protected gameState: GameState
-  protected canvas: HTMLCanvasElement
-  protected backgroundLayer: BackgroundLayer
-  protected playerLayer: PlayerLayer
-  protected EnemyLayer: EnemyLayer
-  public NPCLayer: NPCLayer
-  public uiLayer: UILayer
-  protected obstacleLayer: ObstacleLayer
-  protected cleanupFunctions: Function[]
-  protected data: any
+export abstract class Scene implements IScene {
+  protected _layers: LayerMap
+  protected _bounds: SceneBounds
+  protected _gameState: IGameState
+  protected _cleanupFunctions: (() => void)[]
 
-  constructor(gameState: GameState) {
-    this.gameState = gameState
-    this.canvas = gameState.ctx.canvas
-    this.backgroundLayer = new BackgroundLayer(gameState.ctx)
-    this.playerLayer = new PlayerLayer(gameState)
-    this.EnemyLayer = new EnemyLayer(gameState.ctx)
-    this.NPCLayer = new NPCLayer(gameState.ctx)
-    this.obstacleLayer = new ObstacleLayer(gameState.ctx)
-    this.uiLayer = new UILayer(gameState.ctx)
-    this.cleanupFunctions = []
-    this.setBounds({
-      x: 0,
-      y: 0,
-      width: this.canvas.width,
-      height: this.canvas.height,
-    })
+  protected constructor({ bounds }: { bounds: SceneBounds }) {
+    this._layers = {
+      background: new BackgroundLayer(),
+      obstacles: new ObstacleLayer(),
+      projectiles: new ProjectileLayer(),
+      enemies: new EnemyLayer(),
+      npcs: new NPCLayer(),
+      player: new PlayerLayer(),
+      ui: new UILayer(),
+    }
+    this._bounds = bounds
+    this._cleanupFunctions = []
+    this._gameState = GameState.getInstance()
+  }
+
+  get layers(): LayerMap {
+    return this._layers
+  }
+
+  get bounds(): SceneBounds {
+    return this._bounds
   }
 
   setBounds(bounds: SceneBounds) {
-    this.gameState.currentScene.sceneBounds = bounds
-    this.gameState.camera.setBounds(bounds)
+    this._bounds = bounds
+    this._gameState.camera.setBounds(bounds)
   }
 
   drawWithCamera(target: Target | null, drawFunc: () => void) {
-    this.gameState.camera.update(this.gameState.time)
-    this.gameState.ctx.save()
-    this.gameState.camera.follow(target)
-    this.gameState.camera.apply(this.gameState.ctx)
-    drawFunc()
-    this.gameState.ctx.restore()
+    this._gameState.camera.update(this._gameState.deltaTime)
+    this._gameState.draw((ctx) => {
+      ctx.save()
+      this._gameState.camera.follow(target!!)
+      drawFunc()
+      ctx.restore()
+    })
   }
 
-  enter(data: any) {
-    this.data = data
-  }
+  enter() {}
 
   exit() {
-    if (this.cleanupFunctions) {
-      this.cleanupFunctions.forEach((cleanup) => {
+    if (this._cleanupFunctions) {
+      this._cleanupFunctions.forEach((cleanup) => {
         if (typeof cleanup === "function") cleanup()
       })
-      this.cleanupFunctions = []
+      this._cleanupFunctions = []
     }
-    // Example: Reset zoom when exiting the scene
-    this.gameState.camera.setZoom(1.0)
   }
 
   addControls() {
@@ -84,24 +81,37 @@ export class Scene implements IScene {
     //   this.gameState.camera.shake(500, 10)
     // }
 
-    // Update camera state
     this.draw()
   }
 
   draw() {
-    this.gameState.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    this._gameState.draw((ctx) => {
+      const { width, height } = this._gameState.getCanvasDimensions()
+      ctx.clearRect(0, 0, width, height)
+      this._gameState.withPlayer((player) => {
+        this.drawWithCamera({ x: player.x, y: player.y }, () => {
+          this._layers.background.draw()
+          this._layers.obstacles.draw()
+          this._layers.projectiles.draw()
+          this._layers.enemies.draw()
+          this._layers.npcs.draw()
+          this._layers.player.draw()
 
-    this.drawWithCamera(null, () => {
-      this.backgroundLayer.draw()
-      this.obstacleLayer.draw()
+          if (!this._layers.ui.isDialogActive()) {
+            const obstacles = this._layers.obstacles.objects
+            const enemies = this._layers.enemies.objects
+
+            this._layers.background.update()
+            this._layers.obstacles.update()
+            this._layers.projectiles.update(enemies, obstacles)
+            this._layers.enemies.update(obstacles)
+            this._layers.npcs.update()
+            this._layers.player.update(obstacles)
+          }
+        })
+
+        this._layers.ui.update()
+      })
     })
-
-    this.drawWithCamera(this.playerLayer.getTarget(), () => {
-      this.playerLayer.draw()
-    })
-
-    this.gameState.ctx.save()
-    this.uiLayer.draw()
-    this.gameState.ctx.restore()
   }
 }

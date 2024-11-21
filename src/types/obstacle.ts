@@ -6,7 +6,6 @@ export interface ObstacleConstructorParams {
   width: number
   height: number
   color: string
-  ctx: CanvasRenderingContext2D
 }
 
-export interface ObstacleObject extends BaseGameObject {}
+export interface IObstacle extends BaseGameObject {}

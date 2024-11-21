@@ -2,7 +2,7 @@ import {
   DialogSystemConstructorParams,
   DialogState,
 } from "./types/dialogSystem"
-import { DialogOptions } from "./types/dialog"
+import { DialogOptions, IDialogSystem } from "./types/dialog.js"
 
 export class DialogSystem {
   private ctx: CanvasRenderingContext2D

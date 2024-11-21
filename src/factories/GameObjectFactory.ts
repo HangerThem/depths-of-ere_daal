@@ -4,22 +4,22 @@ import { NPC } from "../npc.js"
 import { Obstacle } from "../obstacle.js"
 import { Tile } from "../tile.js"
 import { DialogSystem } from "../dialog.js"
-import { NPCConstructorParams } from "../types/npc.js"
-import { ObstacleConstructorParams } from "../types/obstacle.js"
-import { EnemyConstructorParams } from "../types/enemy.js"
+import { INPC, NPCConstructorParams } from "../types/npc"
+import { IObstacle, ObstacleConstructorParams } from "../types/obstacle"
 import {
-  IPlayer,
-  PlayerConstructorParams,
-} from "../types/gameObjects/player.js"
-import { TileConstructorParams } from "../types/tile.js"
-import { DialogSystemConstructorParams } from "../types/dialogSystem.js"
-import { IGameObjectFactory } from "../types/factories/IGameObjectFactory.js"
+  EnemyConstructorParams,
+  IEnemy,
+} from "../types/gameObjects/enemies/enemy"
+import { IPlayer, PlayerConstructorParams } from "../types/gameObjects/player"
+import { ITile, TileConstructorParams } from "../types/tile"
+import { DialogSystemConstructorParams } from "../types/dialogSystem"
+import { IGameObjectFactory } from "../types/factories/IGameObjectFactory"
 
 /**
  * A factory class for creating various game objects.
  * This class follows the Singleton design pattern.
  */
-class GameObjectFactory implements IGameObjectFactory {
+export class GameObjectFactory implements IGameObjectFactory {
   private static instance: GameObjectFactory
 
   private constructor() {}
@@ -62,9 +62,8 @@ class GameObjectFactory implements IGameObjectFactory {
     height,
     color,
     hp,
-    gameState,
-  }: EnemyConstructorParams): Enemy {
-    return new Enemy({ x, y, width, height, color, hp, gameState })
+  }: EnemyConstructorParams): IEnemy {
+    return new Enemy({ x, y, width, height, color, hp })
   }
 
   /**
@@ -87,9 +86,8 @@ class GameObjectFactory implements IGameObjectFactory {
     color,
     name,
     dialog,
-    gameState,
-  }: NPCConstructorParams): NPC {
-    return new NPC({ x, y, width, height, color, name, dialog, gameState })
+  }: NPCConstructorParams): INPC {
+    return new NPC({ x, y, width, height, color, name, dialog })
   }
 
   /**
@@ -108,9 +106,8 @@ class GameObjectFactory implements IGameObjectFactory {
     width,
     height,
     color,
-    ctx,
-  }: ObstacleConstructorParams): Obstacle {
-    return new Obstacle({ x, y, width, height, color, ctx })
+  }: ObstacleConstructorParams): IObstacle {
+    return new Obstacle({ x, y, width, height, color })
   }
 
   /**
@@ -129,9 +126,8 @@ class GameObjectFactory implements IGameObjectFactory {
     width,
     height,
     color,
-    ctx,
-  }: TileConstructorParams): Tile {
-    return new Tile({ x, y, width, height, color, ctx })
+  }: TileConstructorParams): ITile {
+    return new Tile({ x, y, width, height, color })
   }
 
   /**
@@ -148,6 +144,5 @@ class GameObjectFactory implements IGameObjectFactory {
   }
 }
 
-const gameObjectFactory = GameObjectFactory.getInstance()
-
-export { GameObjectFactory, gameObjectFactory }
+/** The single instance of the GameObjectFactory. */
+export const gameObjectFactory = GameObjectFactory.getInstance()

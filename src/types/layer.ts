@@ -1,37 +1,37 @@
 import { BaseGameObject } from "./base"
-import { EnemyObject } from "./enemy"
-import { Target } from "./core/camera"
-import { ObstacleObject } from "./obstacle"
-import { PlayerObject } from "./player"
+import { IEnemy } from "./gameObjects/enemies/enemy"
+import { IPlayer } from "./gameObjects/player"
+import { INPC } from "./npc"
+import { IObstacle } from "./obstacle"
+import { ITile } from "./tile"
+import { IProjectile } from "./weapon"
 
-interface ILayer {
-  objects: BaseGameObject[]
+interface ILayer<T extends BaseGameObject> {
+  objects: Set<T>
+  addObject: (object: T) => void
+  removeObject: (object: T) => void
+  update: (...args: any[]) => void
   draw: () => void
 }
 
-export interface IBackgroundLayer extends ILayer {
-  update: () => void
+export interface IBackgroundLayer extends ILayer<ITile> {}
+
+export interface IObstacleLayer extends ILayer<IObstacle> {}
+
+export interface INPCLayer extends ILayer<INPC> {}
+
+export interface IProjectileLayer extends ILayer<IProjectile> {
+  update: (enemies: Set<IEnemy>, obstacles: Set<IObstacle>) => void
 }
 
-export interface IObstacleLayer extends ILayer {
-  update: () => void
+export interface IEnemyLayer extends ILayer<IEnemy> {
+  update: (obstacles: Set<IObstacle>) => void
 }
 
-export interface INPCLayer extends ILayer {
-  update: (player: PlayerObject) => void
+export interface IPlayerLayer extends ILayer<IPlayer> {
+  update: (obstacles: Set<IObstacle>) => void
 }
 
-export interface IProjectileLayer extends ILayer {
-  update: (enemies: EnemyObject[], obstacles: ObstacleObject[]) => void
+export interface IUILayer extends ILayer<BaseGameObject> {
+  isDialogActive: () => boolean
 }
-
-export interface IEnemyLayer extends ILayer {
-  update: (player: PlayerObject, obstacles: ObstacleObject[]) => void
-}
-
-export interface IPlayerLayer extends ILayer {
-  update: (obstacles: ObstacleObject[]) => void
-  getTarget(): Target | null
-}
-
-export interface IUILayer extends ILayer {}

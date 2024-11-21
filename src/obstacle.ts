@@ -1,25 +1,49 @@
-import { ObstacleObject, ObstacleConstructorParams } from "./types/obstacle"
+import { GameState } from "./core/gameState.js"
+import { IGameState } from "./types/core/gameState.js"
+import { ObstacleConstructorParams, IObstacle } from "./types/obstacle"
 
-export class Obstacle implements ObstacleObject {
-  public x: number
-  public y: number
-  public width: number
-  public height: number
-  public color: string
-  public ctx: CanvasRenderingContext2D
+export class Obstacle implements IObstacle {
+  private _x: number
+  private _y: number
+  private _width: number
+  private _height: number
+  private _color: string
+  private _gameState: IGameState
 
-  constructor({ x, y, width, height, color, ctx }: ObstacleConstructorParams) {
-    this.x = x
-    this.y = y
-    this.width = width
-    this.height = height
-    this.color = color
-    this.ctx = ctx
+  constructor({ x, y, width, height, color }: ObstacleConstructorParams) {
+    this._x = x
+    this._y = y
+    this._width = width
+    this._height = height
+    this._color = color
+    this._gameState = GameState.getInstance()
+  }
+
+  get x() {
+    return this._x
+  }
+
+  get y() {
+    return this._y
+  }
+
+  get width() {
+    return this._width
+  }
+
+  get height() {
+    return this._height
+  }
+
+  get color() {
+    return this._color
   }
 
   draw(): void {
-    this.ctx.fillStyle = this.color
-    this.ctx.fillRect(this.x, this.y, this.width, this.height)
+    this._gameState.draw((ctx) => {
+      ctx.fillStyle = this._color
+      ctx.fillRect(this._x, this._y, this._width, this._height)
+    })
   }
 
   update(): void {

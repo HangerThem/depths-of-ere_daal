@@ -1,13 +1,14 @@
-import { EnemyObject } from "./enemy"
-import { ObstacleObject } from "./obstacle"
 import { BaseGameObject } from "./base"
+import { IObstacle } from "./obstacle"
+import { IEnemy } from "./gameObjects/enemies/enemy"
 
 export interface IProjectile extends BaseGameObject {
-  distanceToLive: number
-  update(enemies: EnemyObject[], obstacles: ObstacleObject[]): void
+  active: boolean
+
+  update(enemies: Set<IEnemy>, obstacles: Set<IObstacle>): void
 }
 
 export interface IWeapon {
   attack(x: number, y: number, rotation: number): void
-  update(enemies: EnemyObject[], obstacles: ObstacleObject[]): void
+  update(enemies: Set<IEnemy>, obstacles: Set<IObstacle>): void
 }

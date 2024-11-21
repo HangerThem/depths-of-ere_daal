@@ -1,21 +1,22 @@
 import { Scene } from "../scene.js"
-import { Controls } from "../controls.js"
-import { GameState } from "../types/core/gameState.js"
+import { Controls } from "../controls/controls.js"
 import { gameObjectFactory } from "../factories/GameObjectFactory.js"
+import { SceneBounds } from "../types/scene.js"
 
 export class StartScreen extends Scene {
-  constructor(gameState: GameState) {
-    super(gameState)
-    this.setBounds({
-      x: -1000,
-      y: -1000,
-      width: 1000,
-      height: 1000,
+  constructor() {
+    super({
+      bounds: {
+        x: 0,
+        y: 0,
+        width: 800,
+        height: 600,
+      },
     })
     this.generateLevel()
     this.addControls()
     this.addNPCs()
-    this.generateEnemies()
+    // this.generateEnemies()
   }
 
   addNPCs() {
@@ -32,9 +33,8 @@ export class StartScreen extends Scene {
           choices: [{ text: "Goodbye", next: -1 }],
         },
       ],
-      gameState: this.gameState,
     })
-    this.NPCLayer.addObject(npc)
+    this._layers.npcs.addObject(npc)
   }
 
   generateEnemies() {
@@ -45,32 +45,25 @@ export class StartScreen extends Scene {
       height: 32,
       color: "#f00",
       hp: 100,
-      gameState: this.gameState,
     })
-    this.EnemyLayer.addObject(enemy)
+    this._layers.ui.addObject(enemy)
   }
 
   generateLevel() {
-    const tileSize = 32
+    const tileSize = 50
     const bgColors = ["#313131", "#333333", "#353535", "#373737"]
-    const {
-      x: px,
-      y: py,
-      width,
-      height,
-    } = this.gameState.currentScene.sceneBounds
+    const { x: px, y: py, width, height } = this._bounds
 
     for (let x = px; x < width; x += tileSize) {
       for (let y = py; y < height; y += tileSize) {
         const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)]
-        this.backgroundLayer.addObject(
+        this._layers.background.addObject(
           gameObjectFactory.createTile({
             x,
             y,
             width: tileSize,
             height: tileSize,
             color: bgColor,
-            ctx: this.gameState.ctx,
           })
         )
       }
@@ -82,14 +75,13 @@ export class StartScreen extends Scene {
         const bgColor =
           obstacleColors[Math.floor(Math.random() * obstacleColors.length)]
         if (Math.random() > 0.9) {
-          this.obstacleLayer.addObject(
+          this._layers.obstacles.addObject(
             gameObjectFactory.createObstacle({
               x,
               y,
               width: tileSize,
               height: tileSize,
               color: bgColor,
-              ctx: this.gameState.ctx,
             })
           )
         }
@@ -98,10 +90,10 @@ export class StartScreen extends Scene {
   }
 
   addControls(): void {
-    const { player } = this.gameState
-    this.cleanupFunctions = [
+    const { player } = this._gameState
+    this._cleanupFunctions = [
       Controls.addMovementControls(player!!),
-      Controls.addDialogControls(this.gameState.dialog),
+      Controls.addDialogControls(this._gameState.dialogSystem),
       Controls.addInteractionControls(this),
     ]
   }
@@ -111,25 +103,33 @@ export class StartScreen extends Scene {
   }
 
   draw() {
-    this.gameState.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    const player = this.gameState.player!!
+    this._gameState.draw((ctx) => {
+      const { width, height } = this._gameState.getCanvasDimensions()
+      ctx.clearRect(0, 0, width, height)
+      this._gameState.withPlayer((player) => {
+        this.drawWithCamera({ x: player.x, y: player.y }, () => {
+          this._layers.background.draw()
+          this._layers.obstacles.draw()
+          this._layers.projectiles.draw()
+          this._layers.enemies.draw()
+          this._layers.npcs.draw()
+          this._layers.player.draw()
 
-    this.drawWithCamera({ x: player.x, y: player.y }, () => {
-      this.backgroundLayer.draw()
-      this.obstacleLayer.draw()
-      this.EnemyLayer.draw()
-      this.NPCLayer.draw()
-      this.playerLayer.draw()
+          if (!this._layers.ui.isDialogActive()) {
+            const obstacles = this._layers.obstacles.objects
+            const enemies = this._layers.enemies.objects
 
-      if (!this.uiLayer.isDialogActive()) {
-        this.backgroundLayer.update()
-        this.obstacleLayer.update()
-        this.EnemyLayer.update(player, this.obstacleLayer.objects)
-        this.NPCLayer.update(this.gameState.player!!)
-        this.playerLayer.update(this.obstacleLayer.objects)
-      }
+            this._layers.background.update()
+            this._layers.obstacles.update()
+            this._layers.projectiles.update(enemies, obstacles)
+            this._layers.enemies.update(obstacles)
+            this._layers.npcs.update()
+            this._layers.player.update(obstacles)
+          }
+        })
+
+        this._layers.ui.update()
+      })
     })
-
-    this.uiLayer.update()
   }
 }

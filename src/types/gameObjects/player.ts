@@ -1,5 +1,6 @@
 import { BaseGameObject } from "../base"
-import { GameState } from "../core/gameState"
+import { IGameState } from "../core/gameState"
+import { IObstacle } from "../obstacle"
 
 export interface PlayerConstructorParams {
   x: number
@@ -7,13 +8,10 @@ export interface PlayerConstructorParams {
   width: number
   height: number
   color: string
-  gameState: GameState
+  gameState: IGameState
 }
 
 export interface IPlayer extends BaseGameObject {
-  speed: number
-  gameState: GameState
-
   moveLeft: () => void
   moveRight: () => void
   moveUp: () => void
@@ -21,4 +19,5 @@ export interface IPlayer extends BaseGameObject {
   stopVertical: () => void
   stopHorizontal: () => void
   rotateToCursor: (x: number, y: number) => void
+  update: (obstacles: Set<IObstacle>) => void
 }

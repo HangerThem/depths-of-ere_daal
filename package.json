@@ -11,9 +11,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "serve": "http-serve"
   },
   "devDependencies": {
+    "http-serve": "^1.0.1",
     "typescript": "^4.9.5"
   }
 }

@@ -1,5 +1,4 @@
 import { BaseGameObject } from "../../base"
-import { GameState } from "../../core/gameState"
 import { IPathFinder, Point } from "../../pathfinder"
 
 export interface EnemyState {
@@ -31,11 +30,9 @@ export interface EnemyConstructorParams {
   height: number
   color: string
   hp: number
-  gameState: GameState
 }
 
 export interface IEnemy extends BaseGameObject {
   enemyState: EnemyState
   enemyConfig: EnemyConfig
-  gameState: GameState
 }
