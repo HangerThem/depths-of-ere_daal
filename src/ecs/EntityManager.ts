@@ -18,4 +18,12 @@ export class EntityManager implements IEntityManager {
   getEntities(): Set<IEntity> {
     return this.entities
   }
+
+  getEntityById(id: number): IEntity | undefined {
+    return Array.from(this.entities).find((entity) => entity.id === id)
+  }
+
+  clear(): void {
+    this.entities.clear()
+  }
 }

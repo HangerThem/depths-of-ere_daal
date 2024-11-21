@@ -21,9 +21,13 @@ export class MainMenuScene extends Scene {
     const buttonEntity = entityManager.createEntity()
     componentManager.addComponent(
       buttonEntity,
-      new ButtonComponent({ x: 100, y: 100, width: 100, height: 50 }, () => {
-        loadScene(new GameScene("game"))
-      })
+      new ButtonComponent(
+        { x: 100, y: 100, width: 100, height: 50 },
+        () => {
+          loadScene(new GameScene("game"))
+        },
+        "Start Game"
+      )
     )
     componentManager.addComponent(
       buttonEntity,

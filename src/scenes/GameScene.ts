@@ -1,5 +1,8 @@
 import { InputComponent } from "../components/InputComponent.js"
-import { RenderableComponent } from "../components/RenderableComponent.js"
+import {
+  RenderableComponent,
+  Shape,
+} from "../components/RenderableComponent.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 import { VelocityComponent } from "../components/VelocityComponent.js"
 import { InputSystem } from "../systems/InputSystem.js"
@@ -25,7 +28,7 @@ export class GameScene extends Scene {
     )
     componentManager.addComponent(
       playerEntity,
-      new RenderableComponent("red", "rectangle")
+      new RenderableComponent("red", Shape.CIRCLE)
     )
     componentManager.addComponent(playerEntity, new VelocityComponent())
     componentManager.addComponent(playerEntity, new InputComponent())

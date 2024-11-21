@@ -63,11 +63,18 @@ export class RenderSystem extends System {
         )
         if (!entity) continue
 
-        this.ctx.fillStyle = button.isPressed
-          ? "red"
-          : button.isHovered
-          ? "lightgreen"
-          : "darkgreen"
+        let bgColor = "rgba(255, 255, 255, 0.25)"
+        let textColor = "white"
+
+        if (button.isPressed) {
+          bgColor = "rgba(255, 255, 255, 0.75)"
+          textColor = "black"
+        } else if (button.isHovered) {
+          bgColor = "rgba(255, 255, 255, 0.5)"
+          textColor = "black"
+        }
+
+        this.ctx.fillStyle = bgColor
 
         this.ctx.fillRect(
           button.bounds.x,
@@ -76,10 +83,13 @@ export class RenderSystem extends System {
           button.bounds.height
         )
 
-        this.ctx.fillStyle = "white"
+        this.ctx.fillStyle = textColor
+        this.ctx.textAlign = "center"
+        this.ctx.textBaseline = "middle"
+        this.ctx.font = "16px Arial"
         this.ctx.fillText(
-          "Button",
-          button.bounds.x + 10,
+          button.text,
+          button.bounds.x + button.bounds.width / 2,
           button.bounds.y + button.bounds.height / 2
         )
       }

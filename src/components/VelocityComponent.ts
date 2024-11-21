@@ -1,8 +1,8 @@
 import { Component } from "../ecs/Component.js"
 
 export class VelocityComponent extends Component {
-  vx: number
-  vy: number
+  public vx: number
+  public vy: number
 
   constructor(vx = 0, vy = 0) {
     super()

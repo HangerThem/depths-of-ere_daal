@@ -36,4 +36,35 @@ export class ComponentManager implements IComponentManager {
       | Map<number, T>
       | undefined
   }
+
+  removeComponents(entity: IEntity): void {
+    this.components.forEach((components) => {
+      components.delete(entity.id)
+    })
+  }
+
+  removeComponentsByType<T extends IComponent>(
+    componentClass: new () => T
+  ): void {
+    this.components.delete(componentClass.name)
+  }
+
+  getComponentsByEntity(entity: IEntity): Map<string, IComponent> {
+    const entityComponents = new Map<string, IComponent>()
+    this.components.forEach((components, componentName) => {
+      const component = components.get(entity.id)
+      if (component) {
+        entityComponents.set(componentName, component)
+      }
+    })
+    return entityComponents
+  }
+
+  getComponentsMap(): Map<string, Map<number, IComponent>> {
+    return this.components
+  }
+
+  clear(): void {
+    this.components.clear()
+  }
 }

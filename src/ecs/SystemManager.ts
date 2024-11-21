@@ -19,4 +19,8 @@ export class SystemManager implements ISystemManager {
       system.update(deltaTime, entities, components)
     }
   }
+
+  clear(): void {
+    this.systems = []
+  }
 }

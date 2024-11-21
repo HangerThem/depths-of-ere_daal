@@ -27,10 +27,10 @@ export class CanvasCtxInitializationError extends Error {
 
 export class SceneAlreadyExistsError extends Error {
   constructor(
-    name: string,
-    message = "Scene with the name {name} already exists."
+    sceneName: string,
+    message = `Scene with the name ${sceneName} already exists.`
   ) {
-    super(message.replace("{name}", name))
+    super(message)
     this.name = "SceneAlreadyExistsError"
   }
 }

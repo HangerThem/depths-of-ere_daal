@@ -6,4 +6,8 @@ export interface IEntityManager {
   removeEntity(entity: IEntity): void
 
   getEntities(): Set<IEntity>
+
+  getEntityById(id: number): IEntity | undefined
+
+  clear(): void
 }

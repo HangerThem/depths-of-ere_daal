@@ -10,4 +10,6 @@ export interface ISystemManager {
     entities: IEntityManager,
     components: IComponentManager
   ): void
+
+  clear(): void
 }

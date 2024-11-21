@@ -1,10 +1,15 @@
 import { Component } from "../ecs/Component.js"
 
-export class RenderableComponent extends Component {
-  color: string
-  shape: string
+export enum Shape {
+  RECTANGLE = "rectangle",
+  CIRCLE = "circle",
+}
 
-  constructor(color: string = "black", shape: string = "rectangle") {
+export class RenderableComponent extends Component {
+  public color: string
+  public shape: Shape
+
+  constructor(color = "black", shape = Shape.RECTANGLE) {
     super()
     this.color = color
     this.shape = shape
