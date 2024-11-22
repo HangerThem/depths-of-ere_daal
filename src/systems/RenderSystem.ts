@@ -12,6 +12,14 @@ export class RenderSystem extends System {
   constructor(ctx: CanvasRenderingContext2D) {
     super()
     this.ctx = ctx
+    this.initListeners()
+  }
+
+  private initListeners() {
+    window.addEventListener("resize", () => {
+      this.ctx.canvas.width = window.innerWidth
+      this.ctx.canvas.height = window.innerHeight
+    })
   }
 
   update(updateContext: IUpdateContext): void {
@@ -22,11 +30,11 @@ export class RenderSystem extends System {
     const renderables = components.getComponents(RenderableComponent)
     const buttons = components.getComponents(ButtonComponent)
 
+    const entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
+
     if (renderables) {
       for (const [entityId, renderable] of renderables) {
-        const entity = [...entities.getEntities()].find(
-          (e) => e.id === entityId
-        )
+        const entity = entityMap.get(entityId)
         if (!entity) continue
 
         const transform = components.getComponent(entity, TransformComponent)
