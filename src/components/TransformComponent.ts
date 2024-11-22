@@ -1,6 +1,6 @@
-import { Component } from "../ecs/Component.js"
+import { IComponent } from "../ecs/Component.js"
 
-export class TransformComponent extends Component {
+export class TransformComponent implements IComponent {
   public x: number
   public y: number
   private _rotation: number
@@ -8,7 +8,6 @@ export class TransformComponent extends Component {
   private _scaleY: number
 
   constructor(x = 0, y = 0, rotation = 0, scaleX = 1, scaleY = 1) {
-    super()
     this.x = x
     this.y = y
     this._rotation = rotation

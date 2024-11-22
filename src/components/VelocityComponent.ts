@@ -1,11 +1,10 @@
-import { Component } from "../ecs/Component.js"
+import { IComponent } from "../ecs/Component.js"
 
-export class VelocityComponent extends Component {
+export class VelocityComponent implements IComponent {
   public vx: number
   public vy: number
 
   constructor(vx = 0, vy = 0) {
-    super()
     this.vx = vx
     this.vy = vy
   }

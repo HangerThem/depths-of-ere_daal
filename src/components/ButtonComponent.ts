@@ -1,6 +1,6 @@
-import { Component } from "../ecs/Component.js"
+import { IComponent } from "../ecs/Component.js"
 
-export class ButtonComponent extends Component {
+export class ButtonComponent implements IComponent {
   public bounds: { x: number; y: number; width: number; height: number }
   private _action: () => void
   public text: string
@@ -17,7 +17,6 @@ export class ButtonComponent extends Component {
     action = () => {},
     text = ""
   ) {
-    super()
     this.bounds = bounds
     this._action = action
     this.text = text

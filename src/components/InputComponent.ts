@@ -1,6 +1,6 @@
-import { Component } from "../ecs/Component.js"
+import { IComponent } from "../ecs/Component.js"
 
-export class InputComponent extends Component {
+export class InputComponent implements IComponent {
   public up: boolean = false
   public down: boolean = false
   public left: boolean = false
