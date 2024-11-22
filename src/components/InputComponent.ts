@@ -5,4 +5,5 @@ export class InputComponent implements IComponent {
   public down: boolean = false
   public left: boolean = false
   public right: boolean = false
+  public space: boolean = false
 }

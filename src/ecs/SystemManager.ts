@@ -1,7 +1,6 @@
 import { System } from "./System.js"
-import { EntityManager } from "./EntityManager.js"
-import { ComponentManager } from "./ComponentManager.js"
 import { ISystemManager } from "../types/ecs/ISystemManager.js"
+import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
 export class SystemManager implements ISystemManager {
   private systems: System[] = []
@@ -10,17 +9,18 @@ export class SystemManager implements ISystemManager {
     this.systems.push(system)
   }
 
-  updateSystems(
-    deltaTime: number,
-    entities: EntityManager,
-    components: ComponentManager
-  ): void {
+  updateSystems(updateContext: IUpdateContext): void {
     for (const system of this.systems) {
-      system.update(deltaTime, entities, components)
+      system.update(updateContext)
     }
   }
 
   clear(): void {
+    for (const system of this.systems) {
+      if (system.clear) {
+        system.clear()
+      }
+    }
     this.systems = []
   }
 }

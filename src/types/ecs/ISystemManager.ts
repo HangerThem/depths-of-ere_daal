@@ -1,15 +1,12 @@
-import { ISystem } from "./ISystem.js"
 import { IEntityManager } from "./IEntityManager.js"
 import { IComponentManager } from "./IComponentManager.js"
+import { IUpdateContext } from "./IUpdateContext.js"
+import { System } from "../../ecs/System.js"
 
 export interface ISystemManager {
-  addSystem(system: ISystem): void
+  addSystem(system: System): void
 
-  updateSystems(
-    deltaTime: number,
-    entities: IEntityManager,
-    components: IComponentManager
-  ): void
+  updateSystems(updateContext: IUpdateContext): void
 
   clear(): void
 }

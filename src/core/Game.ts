@@ -32,7 +32,7 @@ class Game implements IGame {
     this.canvas.width = window.innerWidth
     this.canvas.height = window.innerHeight
 
-    this.sceneManager = new SceneManager(this.ctx)
+    this.sceneManager = new SceneManager()
   }
 
   private lastFrameTime: number = 0
@@ -49,7 +49,7 @@ class Game implements IGame {
 
   public start() {
     this.lastFrameTime = performance.now()
-    this.sceneManager.loadScene(new MainMenuScene("main-menu"))
+    this.sceneManager.loadScene(new MainMenuScene())
     this.update(this.lastFrameTime)
   }
 

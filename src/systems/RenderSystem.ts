@@ -4,6 +4,7 @@ import { RenderableComponent } from "../components/RenderableComponent.js"
 import { IEntityManager } from "../types/ecs/IEntityManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { ButtonComponent } from "../components/ButtonComponent.js"
+import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
@@ -13,11 +14,9 @@ export class RenderSystem extends System {
     this.ctx = ctx
   }
 
-  update(
-    deltaTime: number,
-    entities: IEntityManager,
-    components: IComponentManager
-  ): void {
+  update(updateContext: IUpdateContext): void {
+    const { entities, components } = updateContext
+
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
 
     const renderables = components.getComponents(RenderableComponent)
@@ -95,4 +94,6 @@ export class RenderSystem extends System {
       }
     }
   }
+
+  clear(): void {}
 }

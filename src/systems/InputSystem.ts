@@ -2,6 +2,7 @@ import { System } from "../ecs/System.js"
 import { InputComponent } from "../components/InputComponent.js"
 import { IEntityManager } from "../types/ecs/IEntityManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
+import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
 export class InputSystem extends System {
   constructor() {
@@ -13,25 +14,56 @@ export class InputSystem extends System {
 
   private initListeners() {
     window.addEventListener("keydown", (e) => {
-      this.keysPressed.add(e.key)
-      e.preventDefault()
+      if (
+        [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "w",
+          "a",
+          "s",
+          "d",
+          "Space",
+        ].includes(e.key)
+      ) {
+        e.preventDefault()
+        this.keysPressed.add(e.key)
+      }
     })
 
     window.addEventListener("keyup", (e) => {
-      this.keysPressed.delete(e.key)
-      e.preventDefault()
+      if (
+        [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "w",
+          "a",
+          "s",
+          "d",
+          "Space",
+        ].includes(e.key)
+      ) {
+        e.preventDefault()
+        this.keysPressed.delete(e.key)
+      }
     })
+
+    window.addEventListener(
+      "blur",
+      this.keysPressed.clear.bind(this.keysPressed)
+    )
   }
 
-  update(
-    deltaTime: number,
-    entities: IEntityManager,
-    components: IComponentManager
-  ): void {
+  update(updateContext: IUpdateContext): void {
+    const { components } = updateContext
+
     const inputComponents = components.getComponents(InputComponent)
     if (!inputComponents) return
 
-    for (const [entityId, input] of inputComponents) {
+    for (const [, input] of inputComponents) {
       input.up = this.keysPressed.has("ArrowUp") || this.keysPressed.has("w")
       input.down =
         this.keysPressed.has("ArrowDown") || this.keysPressed.has("s")
@@ -39,6 +71,11 @@ export class InputSystem extends System {
         this.keysPressed.has("ArrowLeft") || this.keysPressed.has("a")
       input.right =
         this.keysPressed.has("ArrowRight") || this.keysPressed.has("d")
+      input.space = this.keysPressed.has("Space")
     }
+  }
+
+  clear(): void {
+    this.keysPressed.clear()
   }
 }

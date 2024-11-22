@@ -1,43 +1,40 @@
-import { IComponent } from "../ecs/Component.js"
+import { ComponentManager } from "../ecs/ComponentManager.js"
+import { EntityManager } from "../ecs/EntityManager.js"
+import { SystemManager } from "../ecs/SystemManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
-import { IEntity } from "../types/ecs/IEntity.js"
 import { IEntityManager } from "../types/ecs/IEntityManager.js"
-import { ISystem } from "../types/ecs/ISystem.js"
 import { ISystemManager } from "../types/ecs/ISystemManager.js"
 import { IScene } from "../types/scenes/IScene.js"
 
 export class Scene implements IScene {
   name: string
-  entities: IEntity[]
-  systems: ISystem[]
-  components: IComponent[]
+  entityManager: IEntityManager
+  componentManager: IComponentManager
+  systemManager: ISystemManager
   loadScene: ((scene: IScene) => void) | undefined
   assets: any
 
   constructor(name: string) {
     this.name = name
-    this.entities = []
-    this.systems = []
-    this.components = []
+    this.entityManager = new EntityManager()
+    this.componentManager = new ComponentManager()
+    this.systemManager = new SystemManager()
     this.assets = {}
   }
 
-  initialize(
-    entityManager: IEntityManager,
-    componentManager: IComponentManager,
-    systemManager: ISystemManager,
-    loadScene: (scene: IScene) => void
-  ): void {
-    this.entities = []
-    this.systems = []
-    this.components = []
+  initialize(loadScene: (scene: IScene) => void): void {}
+
+  update(deltaTime: number): void {
+    this.systemManager.updateSystems({
+      deltaTime,
+      entities: this.entityManager,
+      components: this.componentManager
+    })
   }
 
-  update(deltaTime: number): void {}
-
   cleanup(): void {
-    this.entities = []
-    this.systems = []
-    this.components = []
+    this.entityManager.clear()
+    this.componentManager.clear()
+    this.systemManager.clear()
   }
 }

@@ -4,13 +4,12 @@ import { VelocityComponent } from "../components/VelocityComponent.js"
 import { InputComponent } from "../components/InputComponent.js"
 import { IEntityManager } from "../types/ecs/IEntityManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
+import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
 export class MovementSystem extends System {
-  update(
-    deltaTime: number,
-    entities: IEntityManager,
-    components: IComponentManager
-  ): void {
+  update(updateContext: IUpdateContext): void {
+    const { deltaTime, components, entities } = updateContext
+
     const velocities = components.getComponents(VelocityComponent)
     if (!velocities) return
 
@@ -36,4 +35,6 @@ export class MovementSystem extends System {
       }
     }
   }
+
+  clear(): void {}
 }
