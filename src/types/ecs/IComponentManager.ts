@@ -1,4 +1,4 @@
-import { IComponent } from "./IComponent.js"
+import { IComponent } from "../../ecs/Component.js"
 import { IEntity } from "./IEntity.js"
 
 export interface IComponentManager {
@@ -27,6 +27,6 @@ export interface IComponentManager {
   getComponentsByEntity(entity: IEntity): Map<string, IComponent>
 
   getComponentsMap(): Map<string, Map<number, IComponent>>
-  
+
   clear(): void
 }

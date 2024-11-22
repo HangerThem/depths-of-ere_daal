@@ -1,4 +1,4 @@
-import { IComponent } from "../types/ecs/IComponent.js"
+import { IComponent } from "../ecs/Component.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { IEntityManager } from "../types/ecs/IEntityManager.js"

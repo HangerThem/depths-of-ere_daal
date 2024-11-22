@@ -1,6 +1,6 @@
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
-import { IComponent } from "../types/ecs/IComponent.js"
 import { IEntity } from "../types/ecs/IEntity.js"
+import { IComponent } from "./Component.js"
 
 export class ComponentManager implements IComponentManager {
   private components: Map<string, Map<number, IComponent>> = new Map()
