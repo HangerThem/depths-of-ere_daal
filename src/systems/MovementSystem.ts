@@ -2,9 +2,8 @@ import { System } from "../ecs/System.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 import { VelocityComponent } from "../components/VelocityComponent.js"
 import { InputComponent } from "../components/InputComponent.js"
-import { IEntityManager } from "../types/ecs/IEntityManager.js"
-import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
+import { settings } from "../data/settings.js"
 
 export class MovementSystem extends System {
   update(updateContext: IUpdateContext): void {
@@ -13,8 +12,10 @@ export class MovementSystem extends System {
     const velocities = components.getComponents(VelocityComponent)
     if (!velocities) return
 
+    const entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
+
     for (const [entityId, velocity] of velocities) {
-      const entity = [...entities.getEntities()].find((e) => e.id === entityId)
+      const entity = entityMap.get(entityId)
       if (!entity) continue
 
       const transform = components.getComponent(entity, TransformComponent)
@@ -25,10 +26,10 @@ export class MovementSystem extends System {
         velocity.vx = 0
         velocity.vy = 0
 
-        if (input.up) velocity.vy = -speed
-        if (input.down) velocity.vy = speed
-        if (input.left) velocity.vx = -speed
-        if (input.right) velocity.vx = speed
+        if (input.keyboard[settings.controls.top]) velocity.vy = -speed
+        if (input.keyboard[settings.controls.down]) velocity.vy = speed
+        if (input.keyboard[settings.controls.left]) velocity.vx = -speed
+        if (input.keyboard[settings.controls.right]) velocity.vx = speed
 
         transform.x += velocity.vx * deltaTime
         transform.y += velocity.vy * deltaTime

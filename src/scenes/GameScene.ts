@@ -1,4 +1,5 @@
 import { InputComponent } from "../components/InputComponent.js"
+import { PropComponent } from "../components/PropComponent.js"
 import {
   RenderableComponent,
   Shape,
@@ -6,11 +7,15 @@ import {
 import { TransformComponent } from "../components/TransformComponent.js"
 import { VelocityComponent } from "../components/VelocityComponent.js"
 import { InputSystem } from "../systems/InputSystem.js"
+import { InteractionSystem } from "../systems/InteractionSystem.js"
 import { MovementSystem } from "../systems/MovementSystem.js"
 import { RenderSystem } from "../systems/RenderSystem.js"
+import { IEntity } from "../types/ecs/IEntity.js"
+import { MainMenuScene } from "./MainMenuScene.js"
 import { Scene } from "./Scene.js"
 
 export class GameScene extends Scene {
+  private player: IEntity | null = null
   constructor() {
     super("game")
   }
@@ -21,6 +26,7 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new RenderSystem(ctx))
     this.systemManager.addSystem(new InputSystem())
     this.systemManager.addSystem(new MovementSystem())
+    this.systemManager.addSystem(new InteractionSystem())
 
     const playerEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
@@ -29,10 +35,25 @@ export class GameScene extends Scene {
     )
     this.componentManager.addComponent(
       playerEntity,
-      new RenderableComponent("red", Shape.CIRCLE)
+      new RenderableComponent(Shape.CIRCLE, 50, 50, "#0000ff")
     )
     this.componentManager.addComponent(playerEntity, new VelocityComponent())
     this.componentManager.addComponent(playerEntity, new InputComponent())
+    this.player = playerEntity
+
+    const prop = this.entityManager.createEntity()
+    this.componentManager.addComponent(prop, new TransformComponent(200, 200))
+    this.componentManager.addComponent(
+      prop,
+      new RenderableComponent(Shape.SQUARE, 50, 50, "#ff0000")
+    )
+    this.componentManager.addComponent(
+      prop,
+      new PropComponent(() => {
+        console.log("Interacted with prop")
+        loadScene(new MainMenuScene())
+      })
+    )
   }
 
   update(deltaTime: number): void {
@@ -40,6 +61,7 @@ export class GameScene extends Scene {
       deltaTime,
       entities: this.entityManager,
       components: this.componentManager,
+      player: this.player!!,
     })
   }
 

@@ -1,10 +1,9 @@
 import { System } from "../ecs/System.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 import { RenderableComponent } from "../components/RenderableComponent.js"
-import { IEntityManager } from "../types/ecs/IEntityManager.js"
-import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { ButtonComponent } from "../components/ButtonComponent.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
+import { Shape } from "../components/RenderableComponent.js"
 
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
@@ -44,15 +43,22 @@ export class RenderSystem extends System {
         this.ctx.translate(transform.x, transform.y)
         this.ctx.rotate(transform.rotation)
         this.ctx.scale(transform.scaleX, transform.scaleY)
+
         this.ctx.fillStyle = renderable.color
 
         switch (renderable.shape) {
-          case "rectangle":
-            this.ctx.fillRect(-25, -25, 50, 50)
+          case Shape.SQUARE:
+            this.ctx.fillRect(0, 0, renderable.width, renderable.height)
             break
-          case "circle":
+          case Shape.CIRCLE:
             this.ctx.beginPath()
-            this.ctx.arc(0, 0, 25, 0, Math.PI * 2)
+            this.ctx.arc(
+              renderable.width / 2,
+              renderable.height / 2,
+              renderable.width / 2,
+              0,
+              Math.PI * 2
+            )
             this.ctx.fill()
             break
           default:

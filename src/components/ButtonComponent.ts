@@ -2,7 +2,7 @@ import { IComponent } from "../ecs/Component.js"
 
 export class ButtonComponent implements IComponent {
   public bounds: { x: number; y: number; width: number; height: number }
-  private _action: () => void
+  public action: () => void
   public text: string
   public isHovered: boolean
   public isPressed: boolean
@@ -18,13 +18,9 @@ export class ButtonComponent implements IComponent {
     text = ""
   ) {
     this.bounds = bounds
-    this._action = action
+    this.action = action
     this.text = text
     this.isHovered = false
     this.isPressed = false
-  }
-
-  get action() {
-    return this._action
   }
 }

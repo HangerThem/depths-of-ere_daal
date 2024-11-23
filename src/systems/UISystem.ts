@@ -1,6 +1,5 @@
 import { System } from "../ecs/System.js"
 import { ButtonComponent } from "../components/ButtonComponent.js"
-import { IEntityManager } from "../types/ecs/IEntityManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
