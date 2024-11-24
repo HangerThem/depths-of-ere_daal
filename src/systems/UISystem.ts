@@ -15,6 +15,7 @@ export class UISystem extends System {
     this.mousePos = { x: 0, y: 0 }
     this.isMousePressed = false
     this.wasMousePressed = false
+
     this.canvas = canvas
 
     this.canvas.addEventListener("mousemove", this.onMouseMove)

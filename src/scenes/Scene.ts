@@ -7,12 +7,14 @@ import { ISystemManager } from "../types/ecs/ISystemManager.js"
 import { IScene } from "../types/scenes/IScene.js"
 
 export class Scene implements IScene {
-  name: string
-  entityManager: IEntityManager
-  componentManager: IComponentManager
-  systemManager: ISystemManager
-  loadScene: ((scene: IScene) => void) | undefined
-  assets: any
+  public name: string
+  public entityManager: IEntityManager
+  public componentManager: IComponentManager
+  public systemManager: ISystemManager
+  protected canvas: HTMLCanvasElement | null = null
+  protected ctx: CanvasRenderingContext2D | null = null
+  protected loadScene!: (scene: IScene) => void
+  protected assets: any
 
   constructor(name: string) {
     this.name = name
@@ -22,13 +24,17 @@ export class Scene implements IScene {
     this.assets = {}
   }
 
-  initialize(loadScene: (scene: IScene) => void): void {}
+  initialize(canvasId: string, loadScene: (scene: IScene) => void): void {
+    this.canvas = document.getElementById(canvasId) as HTMLCanvasElement
+    this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D
+    this.loadScene = loadScene
+  }
 
   update(deltaTime: number): void {
     this.systemManager.updateSystems({
       deltaTime,
       entities: this.entityManager,
-      components: this.componentManager
+      components: this.componentManager,
     })
   }
 

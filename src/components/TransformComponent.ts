@@ -8,10 +8,16 @@ type Position = {
 export class TransformComponent implements IComponent {
   public position: Position
   private _rotation: number
+  public scale = { x: 1, y: 1 }
 
-  constructor({ position = { x: 0, y: 0 }, rotation = 0 } = {}) {
+  constructor({
+    position = { x: 0, y: 0 },
+    rotation = 0,
+    scale = { x: 1, y: 1 },
+  } = {}) {
     this.position = position
     this._rotation = rotation
+    this.scale = scale
   }
 
   get rotation() {

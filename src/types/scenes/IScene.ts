@@ -1,5 +1,5 @@
 export interface IScene {
-  initialize(loadScene: (scene: IScene) => void): void
+  initialize(canvasId: string, loadScene: (scene: IScene) => void): void
 
   update(deltaTime: number): void
 

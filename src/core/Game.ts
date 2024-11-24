@@ -1,5 +1,4 @@
 import { IGame } from "../types/core/IGame.js"
-import { CanvasInitializationError } from "../errors/RenderingErrors.js"
 import { ISceneManager } from "../types/scenes/ISceneManager.js"
 import { SceneManager } from "../scenes/SceneManager.js"
 import { MainMenuScene } from "../scenes/MainMenuScene.js"
@@ -9,8 +8,6 @@ import { MainMenuScene } from "../scenes/MainMenuScene.js"
  * Initializes the game canvas and game state.
  */
 class Game implements IGame {
-  private canvas: HTMLCanvasElement
-  private ctx: CanvasRenderingContext2D
   private animationFrameId: number | null = null
   private sceneManager: ISceneManager
 
@@ -20,19 +17,7 @@ class Game implements IGame {
    * @throws Error if the canvas element is not an HTMLCanvasElement
    */
   constructor(canvasId: string = "gameCanvas") {
-    const canvas = document.getElementById(canvasId) as HTMLCanvasElement
-    if (!canvas) {
-      throw new CanvasInitializationError(
-        "Canvas element with ID 'gameCanvas' not found."
-      )
-    }
-    this.canvas = canvas
-    this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D
-
-    this.canvas.width = window.innerWidth
-    this.canvas.height = window.innerHeight
-
-    this.sceneManager = new SceneManager()
+    this.sceneManager = new SceneManager(canvasId)
   }
 
   private lastFrameTime: number = 0

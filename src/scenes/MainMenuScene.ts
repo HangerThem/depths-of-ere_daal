@@ -11,11 +11,10 @@ export class MainMenuScene extends Scene {
     super("main-menu")
   }
 
-  initialize(loadScene: (scene: IScene) => void): void {
-    const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
-    this.systemManager.addSystem(new RenderSystem(ctx))
-    this.systemManager.addSystem(new UISystem(canvas))
+  initialize(canvasId: string, loadScene: (scene: IScene) => void): void {
+    super.initialize(canvasId, loadScene)
+    this.systemManager.addSystem(new RenderSystem(this.ctx!!))
+    this.systemManager.addSystem(new UISystem(this.canvas!!))
 
     const buttonEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
@@ -23,7 +22,7 @@ export class MainMenuScene extends Scene {
       new ButtonComponent({
         bounds: { x: 100, y: 100, width: 100, height: 50 },
         action: () => {
-          loadScene(new GameScene())
+          this.loadScene && this.loadScene(new GameScene())
         },
         text: "Start Game",
       })
@@ -35,16 +34,10 @@ export class MainMenuScene extends Scene {
   }
 
   update(deltaTime: number): void {
-    this.systemManager.updateSystems({
-      deltaTime,
-      entities: this.entityManager,
-      components: this.componentManager,
-    })
+    super.update(deltaTime)
   }
 
   cleanup(): void {
-    this.entityManager.clear()
-    this.componentManager.clear()
-    this.systemManager.clear()
+    super.cleanup.bind(this)()
   }
 }

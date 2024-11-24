@@ -5,7 +5,6 @@ import {
   PhysicsComponent,
 } from "../components/PhysicsComponent.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
-import { IEntityManager } from "../types/ecs/IEntityManager.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 

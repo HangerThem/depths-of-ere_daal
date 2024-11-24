@@ -7,6 +7,7 @@ import { Shape } from "../components/RenderableComponent.js"
 import { PropComponent } from "../components/PropComponent.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { HealthComponent } from "../components/HealthComponent.js"
+import { PhysicsComponent } from "../components/PhysicsComponent.js"
 
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
@@ -17,19 +18,24 @@ export class RenderSystem extends System {
     this.ctx = ctx
     this.entityMap = new Map()
     this.initListeners()
+    this.onResize()
   }
 
   private initListeners() {
-    window.addEventListener("resize", () => {
-      this.ctx.canvas.width = window.innerWidth
-      this.ctx.canvas.height = window.innerHeight
-    })
+    window.addEventListener("resize", this.onResize)
+  }
+
+  private onResize = () => {
+    this.ctx.canvas.width = window.innerWidth
+    this.ctx.canvas.height = window.innerHeight
   }
 
   update(updateContext: IUpdateContext): void {
     const { entities, components } = updateContext
 
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    this.ctx.fillStyle = "#333"
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
 
     const renderables = components.getComponents(RenderableComponent)
     const buttons = components.getComponents(ButtonComponent)
@@ -44,6 +50,7 @@ export class RenderSystem extends System {
         const transform = components.getComponent(entity, TransformComponent)
         const prop = components.getComponent(entity, PropComponent)
         const health = components.getComponent(entity, HealthComponent)
+        const physic = components.getComponent(entity, PhysicsComponent)
         if (!transform) continue
 
         this.ctx.save()
@@ -76,11 +83,44 @@ export class RenderSystem extends System {
             )
             this.ctx.fill()
             break
+          case Shape.SPRITE:
+            if (!renderable.sprite) break
+
+            this.ctx.save()
+            this.ctx.scale(transform.scale.x, transform.scale.y)
+            if (transform.scale.x < 0) {
+              this.ctx.translate(-renderable.width, 0)
+            }
+            if (transform.scale.y < 0) {
+              this.ctx.translate(0, -renderable.height)
+            }
+            if (transform.scale.x < 0 && transform.scale.y < 0) {
+              this.ctx.translate(-renderable.width, -renderable.height)
+            }
+            if (physic && physic.isMoving) {
+              const speed = physic.slow ? 200 : 100
+              this.ctx.translate(
+                Math.sin(performance.now() / speed) * 2,
+                Math.cos(performance.now() / speed) * 2
+              )
+            }
+            this.ctx.drawImage(
+              renderable.sprite,
+              0,
+              0,
+              renderable.width,
+              renderable.height
+            )
+            this.ctx.restore()
+
+            break
           default:
             break
         }
 
         if (health) {
+          this.ctx.fillStyle = "#000"
+          this.ctx.fillRect(-1, renderable.height + 4, renderable.width + 2, 7)
           this.ctx.fillStyle = "red"
           this.ctx.fillRect(0, renderable.height + 5, renderable.width, 5)
 

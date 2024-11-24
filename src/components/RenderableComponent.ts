@@ -3,6 +3,7 @@ import { IComponent } from "../ecs/Component.js"
 export enum Shape {
   SQUARE,
   CIRCLE,
+  SPRITE,
 }
 
 export class RenderableComponent implements IComponent {
@@ -10,17 +11,20 @@ export class RenderableComponent implements IComponent {
   public width: number
   public height: number
   private _color: string
+  public sprite?: HTMLImageElement | undefined
 
   constructor({
     shape = Shape.SQUARE,
     width = 0,
     height = 0,
     color = "#ffffff",
+    sprite = new Image(),
   } = {}) {
     this.shape = shape
     this.width = width
     this.height = height
     this._color = color
+    this.sprite = sprite
   }
 
   public get color() {
