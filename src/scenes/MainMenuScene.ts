@@ -20,17 +20,17 @@ export class MainMenuScene extends Scene {
     const buttonEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
       buttonEntity,
-      new ButtonComponent(
-        { x: 100, y: 100, width: 100, height: 50 },
-        () => {
+      new ButtonComponent({
+        bounds: { x: 100, y: 100, width: 100, height: 50 },
+        action: () => {
           loadScene(new GameScene())
         },
-        "Start Game"
-      )
+        text: "Start Game",
+      })
     )
     this.componentManager.addComponent(
       buttonEntity,
-      new TransformComponent(100, 100)
+      new TransformComponent({ position: { x: 100, y: 100 } })
     )
   }
 

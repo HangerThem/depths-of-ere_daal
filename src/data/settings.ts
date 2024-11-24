@@ -1,6 +1,6 @@
 export const settings = {
   controls: {
-    top: "w",
+    up: "w",
     left: "a",
     down: "s",
     right: "d",

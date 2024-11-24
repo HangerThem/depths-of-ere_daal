@@ -1,18 +1,17 @@
 import { IComponent } from "../ecs/Component.js"
 
-export class TransformComponent implements IComponent {
-  public x: number
-  public y: number
-  private _rotation: number
-  private _scaleX: number
-  private _scaleY: number
+type Position = {
+  x: number
+  y: number
+}
 
-  constructor(x = 0, y = 0, rotation = 0, scaleX = 1, scaleY = 1) {
-    this.x = x
-    this.y = y
+export class TransformComponent implements IComponent {
+  public position: Position
+  private _rotation: number
+
+  constructor({ position = { x: 0, y: 0 }, rotation = 0 } = {}) {
+    this.position = position
     this._rotation = rotation
-    this._scaleX = scaleX
-    this._scaleY = scaleY
   }
 
   get rotation() {
@@ -27,27 +26,5 @@ export class TransformComponent implements IComponent {
     } else {
       this._rotation = value
     }
-  }
-
-  get scaleX() {
-    return this._scaleX
-  }
-
-  set scaleX(value) {
-    if (value === 0) {
-      throw new Error("Scale cannot be 0")
-    }
-    this._scaleX = value
-  }
-
-  get scaleY() {
-    return this._scaleY
-  }
-
-  set scaleY(value) {
-    if (value === 0) {
-      throw new Error("Scale cannot be 0")
-    }
-    this._scaleY = value
   }
 }

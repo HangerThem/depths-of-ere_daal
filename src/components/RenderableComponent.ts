@@ -11,12 +11,12 @@ export class RenderableComponent implements IComponent {
   public height: number
   private _color: string
 
-  constructor(
-    shape: Shape = Shape.SQUARE,
+  constructor({
+    shape = Shape.SQUARE,
     width = 0,
     height = 0,
-    color = "#ffffff"
-  ) {
+    color = "#ffffff",
+  } = {}) {
     this.shape = shape
     this.width = width
     this.height = height

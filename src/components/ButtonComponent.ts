@@ -7,7 +7,7 @@ export class ButtonComponent implements IComponent {
   public isHovered: boolean
   public isPressed: boolean
 
-  constructor(
+  constructor({
     bounds = {
       x: 0,
       y: 0,
@@ -15,8 +15,8 @@ export class ButtonComponent implements IComponent {
       height: 50,
     },
     action = () => {},
-    text = ""
-  ) {
+    text = "",
+  } = {}) {
     this.bounds = bounds
     this.action = action
     this.text = text

@@ -1,9 +1,7 @@
 import { IComponent } from "../ecs/Component.js"
 
 export class InputComponent implements IComponent {
-  public keyboard: {
-    [key: string]: boolean
-  } = {}
+  public keyboard: Set<string> = new Set()
 
   public mouse: {
     x: number

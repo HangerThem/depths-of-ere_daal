@@ -5,7 +5,10 @@ import {
   Shape,
 } from "../components/RenderableComponent.js"
 import { TransformComponent } from "../components/TransformComponent.js"
-import { VelocityComponent } from "../components/VelocityComponent.js"
+import {
+  CollisionFlags,
+  PhysicsComponent,
+} from "../components/PhysicsComponent.js"
 import { InputSystem } from "../systems/InputSystem.js"
 import { InteractionSystem } from "../systems/InteractionSystem.js"
 import { MovementSystem } from "../systems/MovementSystem.js"
@@ -13,6 +16,8 @@ import { RenderSystem } from "../systems/RenderSystem.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { MainMenuScene } from "./MainMenuScene.js"
 import { Scene } from "./Scene.js"
+import { HealthComponent } from "../components/HealthComponent.js"
+import { CollisionSystem } from "../systems/CollisionsSystem.js"
 
 export class GameScene extends Scene {
   private player: IEntity | null = null
@@ -27,31 +32,68 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new InputSystem())
     this.systemManager.addSystem(new MovementSystem())
     this.systemManager.addSystem(new InteractionSystem())
+    this.systemManager.addSystem(new CollisionSystem())
 
     const playerEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
       playerEntity,
-      new TransformComponent(100, 100)
+      new TransformComponent({ position: { x: 100, y: 100 } })
     )
     this.componentManager.addComponent(
       playerEntity,
-      new RenderableComponent(Shape.CIRCLE, 50, 50, "#0000ff")
+      new RenderableComponent({
+        shape: Shape.CIRCLE,
+        width: 50,
+        height: 50,
+        color: "#00ff00",
+      })
     )
-    this.componentManager.addComponent(playerEntity, new VelocityComponent())
+    this.componentManager.addComponent(
+      playerEntity,
+      new HealthComponent({
+        health: 50,
+        maxHealth: 100,
+      })
+    )
+    this.componentManager.addComponent(
+      playerEntity,
+      new PhysicsComponent({
+        collisionBox: { width: 50, height: 50 },
+        collisionFlag: CollisionFlags.SOLID,
+      })
+    )
     this.componentManager.addComponent(playerEntity, new InputComponent())
     this.player = playerEntity
 
     const prop = this.entityManager.createEntity()
-    this.componentManager.addComponent(prop, new TransformComponent(200, 200))
     this.componentManager.addComponent(
       prop,
-      new RenderableComponent(Shape.SQUARE, 50, 50, "#ff0000")
+      new TransformComponent({ position: { x: 200, y: 200 } })
     )
     this.componentManager.addComponent(
       prop,
-      new PropComponent(() => {
-        console.log("Interacted with prop")
-        loadScene(new MainMenuScene())
+      new RenderableComponent({
+        shape: Shape.SQUARE,
+        width: 50,
+        height: 50,
+        color: "#ff0000",
+      })
+    )
+    this.componentManager.addComponent(
+      prop,
+      new PhysicsComponent({
+        collisionBox: { width: 50, height: 50 },
+        collisionFlag: CollisionFlags.SEMISOLID,
+      })
+    )
+    this.componentManager.addComponent(
+      prop,
+      new PropComponent({
+        interact: () => {
+          this.componentManager
+            .getComponent(this.player!!, HealthComponent)
+            ?.takeDamage(10)
+        },
       })
     )
   }
