@@ -18,6 +18,8 @@ import { HealthComponent } from "../components/HealthComponent.js"
 import { CollisionSystem } from "../systems/CollisionsSystem.js"
 import { IScene } from "../types/scenes/IScene.js"
 import { PropComponent } from "../components/PropComponent.js"
+import { CombatSystem } from "../systems/CombatSystem.js"
+import { WeaponComponent } from "../components/WeaponComponent.js"
 
 const LEVEL = [
   "####################",
@@ -55,8 +57,11 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new MovementSystem())
     this.systemManager.addSystem(new InteractionSystem())
     this.systemManager.addSystem(new CollisionSystem())
+    this.systemManager.addSystem(new CombatSystem())
 
     this.createLevel()
+
+    this.addBox(200, 200, 50, 50, "#f00", 30, CollisionFlags.SOLID)
 
     const playerSprite = new Image()
     playerSprite.src = "/assets/player.png"
@@ -64,7 +69,7 @@ export class GameScene extends Scene {
     const playerEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
       playerEntity,
-      new TransformComponent({ position: { x: 50, y: 50 } })
+      new TransformComponent({ position: { x: 100, y: 200 } })
     )
     this.componentManager.addComponent(
       playerEntity,
@@ -85,13 +90,45 @@ export class GameScene extends Scene {
     this.componentManager.addComponent(
       playerEntity,
       new PhysicsComponent({
-        speed: 100,
+        speed: 2.5,
         collisionBox: { width: 50, height: 50 },
         collisionFlag: CollisionFlags.SOLID,
       })
     )
     this.componentManager.addComponent(playerEntity, new InputComponent())
+    this.componentManager.addComponent(playerEntity, new WeaponComponent())
     this.player = playerEntity
+  }
+
+  private addBox(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    color: string,
+    health: number,
+    collisionFlag: CollisionFlags
+  ): void {
+    const entity = this.entityManager.createEntity()
+    this.componentManager.addComponent(
+      entity,
+      new TransformComponent({ position: { x, y } })
+    )
+    this.componentManager.addComponent(
+      entity,
+      new RenderableComponent({ shape: Shape.SQUARE, width, height, color })
+    )
+    this.componentManager.addComponent(
+      entity,
+      new PhysicsComponent({
+        collisionBox: { width, height },
+        collisionFlag,
+      })
+    )
+    this.componentManager.addComponent(
+      entity,
+      new HealthComponent({ health, maxHealth: health })
+    )
   }
 
   private createLevel(): void {

@@ -8,6 +8,7 @@ import { PropComponent } from "../components/PropComponent.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { HealthComponent } from "../components/HealthComponent.js"
 import { PhysicsComponent } from "../components/PhysicsComponent.js"
+import { WeaponComponent } from "../components/WeaponComponent.js"
 
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
@@ -50,6 +51,7 @@ export class RenderSystem extends System {
         const transform = components.getComponent(entity, TransformComponent)
         const prop = components.getComponent(entity, PropComponent)
         const health = components.getComponent(entity, HealthComponent)
+        const weapon = components.getComponent(entity, WeaponComponent)
         const physic = components.getComponent(entity, PhysicsComponent)
         if (!transform) continue
 
@@ -131,6 +133,42 @@ export class RenderSystem extends System {
             (renderable.width * health.health) / health.maxHealth,
             5
           )
+        }
+
+        if (weapon) {
+          this.ctx.save()
+          this.ctx.translate(renderable.width / 2, renderable.height / 2)
+          this.ctx.rotate((weapon.cooldown / weapon.attackSpeed) * Math.PI * 2)
+          this.ctx.fillStyle = "black"
+          this.ctx.fillRect(
+            renderable.width / 2 - 5,
+            renderable.height / 2 - 5,
+            10,
+            10
+          )
+
+          this.ctx.strokeStyle = "black"
+          this.ctx.lineWidth = 2
+          this.ctx.beginPath()
+          this.ctx.moveTo(renderable.width / 2, renderable.height / 2)
+          this.ctx.lineTo(
+            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+            renderable.height / 2
+          )
+          this.ctx.stroke()
+
+          this.ctx.beginPath()
+          this.ctx.moveTo(
+            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+            renderable.height / 2
+          )
+          this.ctx.lineTo(
+            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+            renderable.height / 2 + 5
+          )
+          this.ctx.stroke()
+
+          this.ctx.restore()
         }
 
         this.ctx.restore()

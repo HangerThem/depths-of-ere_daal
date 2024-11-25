@@ -1,5 +1,7 @@
 import { System } from "../ecs/System.js"
 import { TransformComponent } from "../components/TransformComponent.js"
+import type { Position } from "../components/TransformComponent.js"
+import type { CollisionBox } from "../components/PhysicsComponent.js"
 import {
   CollisionFlags,
   PhysicsComponent,
@@ -16,6 +18,16 @@ export class CollisionSystem extends System {
     this.entityMap = new Map()
   }
 
+  private getPositions(
+    entity: IEntity,
+    components: IComponentManager
+  ): { position: Position; collisionBox: CollisionBox } | null {
+    const transform = components.getComponent(entity, TransformComponent)
+    const physics = components.getComponent(entity, PhysicsComponent)
+    if (!transform || !physics) return null
+    return { position: transform.position, collisionBox: physics.collisionBox }
+  }
+
   update(updateContext: IUpdateContext): void {
     const { components, entities } = updateContext
 
@@ -28,36 +40,42 @@ export class CollisionSystem extends System {
       const entity = this.entityMap.get(entityId)
       if (!entity) continue
 
+      const posData = this.getPositions(entity, components)
+      if (!posData) continue
+      const { position: positionA } = posData
+
+      const collidingEntities = this.detectCollisions(
+        physics,
+        entityId,
+        components
+      )
+
       const transform = components.getComponent(entity, TransformComponent)
 
-      if (transform) {
-        const collidingEntities = this.detectCollisions(
-          physics,
-          entityId,
-          components
-        )
+      if (!transform) continue
 
-        for (const otherEntityId of collidingEntities) {
-          const otherEntity = this.entityMap.get(otherEntityId)
-          if (!otherEntity) continue
+      for (const otherEntityId of collidingEntities) {
+        const otherEntity = this.entityMap.get(otherEntityId)
+        if (!otherEntity) continue
 
-          const otherPhysic = physics.get(otherEntityId)
-          if (!otherPhysic) continue
+        const otherPhysic = physics.get(otherEntityId)
+        const otherPosData = this.getPositions(otherEntity, components)
+        if (!otherPosData) continue
+        const { position: positionB, collisionBox: collisionBoxB } =
+          otherPosData
 
-          if (otherPhysic && physic) {
-            if (this.isColliding(entityId, otherEntityId, components)) {
-              if (otherPhysic.collisionFlag === CollisionFlags.SEMISOLID) {
-                physic.slow = true
-              } else if (otherPhysic.collisionFlag === CollisionFlags.SOLID) {
-                transform.position.x -=
-                  physic.velocity.vx * updateContext.deltaTime
-                transform.position.y -=
-                  physic.velocity.vy * updateContext.deltaTime
+        if (
+          physic.isCollidingWith(positionA, positionB, collisionBoxB) &&
+          otherPhysic
+        ) {
+          if (otherPhysic.isSemiSolid()) {
+            physic.slow = true
+          } else if (otherPhysic.isSolid()) {
+            const x = -(physic.velocity.vx * updateContext.deltaTime)
+            const y = -(physic.velocity.vy * updateContext.deltaTime)
 
-                physic.velocity.vx = 0
-                physic.velocity.vy = 0
-              }
-            }
+            transform.move(x, y, physic.speed)
+            physic.stop()
           }
         }
       }
@@ -73,62 +91,34 @@ export class CollisionSystem extends System {
 
     const entity = this.entityMap.get(entityId)
     const physic = physics.get(entityId)
-    if (!entity || !physic || physic?.collisionFlag === CollisionFlags.NONE)
+    if (
+      !entity ||
+      !physic ||
+      !physic.isMoving ||
+      (!physic.isSolid() && !physic.isSemiSolid())
+    )
       return collidingEntities
+
+    const posData = this.getPositions(entity, components)
+    if (!posData) return collidingEntities
+    const { position: positionA } = posData
 
     for (const [otherEntityId, otherPhysic] of physics) {
       if (otherEntityId === entityId) continue
 
-      if (this.isColliding(entityId, otherEntityId, components)) {
+      const otherEntity = this.entityMap.get(otherEntityId)
+      if (!otherEntity || !otherPhysic) continue
+
+      const otherPosData = this.getPositions(otherEntity, components)
+      if (!otherPosData) continue
+      const { position: positionB, collisionBox: collisionBoxB } = otherPosData
+
+      if (otherPhysic.isCollidingWith(positionA, positionB, collisionBoxB)) {
         collidingEntities.push(otherEntityId)
       }
     }
 
     return collidingEntities
-  }
-
-  private isColliding(
-    collisionAID: number,
-    collisionBID: number,
-    components: IComponentManager
-  ): boolean {
-    const entityA = this.entityMap.get(collisionAID)
-    const entityB = this.entityMap.get(collisionBID)
-    if (!entityA || !entityB) return false
-
-    const collisionAPhysics = components.getComponent(entityA, PhysicsComponent)
-    const collisionBPhysics = components.getComponent(entityB, PhysicsComponent)
-    const collisionATransform = components.getComponent(
-      entityA,
-      TransformComponent
-    )
-    const collisionBTransform = components.getComponent(
-      entityB,
-      TransformComponent
-    )
-    if (!collisionAPhysics || !collisionBPhysics) return false
-    if (!collisionATransform || !collisionBTransform) return false
-
-    const aLeft = collisionATransform.position.x
-    const aRight =
-      collisionATransform.position.x + collisionAPhysics.collisionBox.width
-    const aTop = collisionATransform.position.y
-    const aBottom =
-      collisionATransform.position.y + collisionAPhysics.collisionBox.height
-
-    const bLeft = collisionBTransform.position.x
-    const bRight =
-      collisionBTransform.position.x + collisionBPhysics.collisionBox.width
-    const bTop = collisionBTransform.position.y
-    const bBottom =
-      collisionBTransform.position.y + collisionBPhysics.collisionBox.height
-
-    return !(
-      aLeft > bRight ||
-      aRight < bLeft ||
-      aTop > bBottom ||
-      aBottom < bTop
-    )
   }
 
   clear(): void {}

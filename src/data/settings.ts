@@ -5,5 +5,6 @@ export const settings = {
     down: "s",
     right: "d",
     interact: "e",
+    attack: "q",
   },
 }

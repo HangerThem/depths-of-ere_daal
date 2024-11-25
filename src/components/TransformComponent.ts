@@ -1,6 +1,6 @@
 import { IComponent } from "../ecs/Component.js"
 
-type Position = {
+export type Position = {
   x: number
   y: number
 }
@@ -32,5 +32,16 @@ export class TransformComponent implements IComponent {
     } else {
       this._rotation = value
     }
+  }
+
+  public move(x: number, y: number, speed: number) {
+    const length = Math.sqrt(x * x + y * y)
+    if (length !== 0) {
+      x /= length
+      y /= length
+    }
+
+    this.position.x += x * speed
+    this.position.y += y * speed
   }
 }

@@ -34,8 +34,7 @@ export class MovementSystem extends System {
           slow = true
         }
 
-        physic.velocity.vx = 0
-        physic.velocity.vy = 0
+        physic.stop()
 
         if (input.keyboard.has(settings.controls.up)) {
           physic.velocity.vy = -speed
@@ -52,10 +51,10 @@ export class MovementSystem extends System {
           transform.scale.x = -1
         }
 
-        transform.position.x =
-          transform.position.x + physic.velocity.vx * deltaTime
-        transform.position.y =
-          transform.position.y + physic.velocity.vy * deltaTime
+        const x = physic.velocity.vx * updateContext.deltaTime
+        const y = physic.velocity.vy * updateContext.deltaTime
+
+        transform.move(x, y, speed)
 
         physic.slow = slow
       }
