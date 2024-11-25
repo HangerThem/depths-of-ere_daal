@@ -2,14 +2,15 @@ import { System } from "../ecs/System.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 import type { Position } from "../components/TransformComponent.js"
 import type { CollisionBox } from "../components/PhysicsComponent.js"
-import {
-  CollisionFlags,
-  PhysicsComponent,
-} from "../components/PhysicsComponent.js"
+import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 
+/**
+ * Manages collisions between entities.
+ * @extends {System}
+ */
 export class CollisionSystem extends System {
   private entityMap: Map<number, IEntity>
 
@@ -28,6 +29,10 @@ export class CollisionSystem extends System {
     return { position: transform.position, collisionBox: physics.collisionBox }
   }
 
+  /**
+   * Detects collisions between entities.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { components, entities } = updateContext
 
@@ -121,5 +126,8 @@ export class CollisionSystem extends System {
     return collidingEntities
   }
 
+  /**
+   * Clears the system.
+   */
   clear(): void {}
 }

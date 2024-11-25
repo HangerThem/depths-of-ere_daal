@@ -5,11 +5,22 @@ export type Position = {
   y: number
 }
 
+/**
+ * Represents a component that deals with the position, rotation, and scale of an entity.
+ * @implements {IComponent}
+ */
 export class TransformComponent implements IComponent {
   public position: Position
   private _rotation: number
   public scale = { x: 1, y: 1 }
 
+  /**
+   * Creates an instance of TransformComponent.
+   *
+   * @param position - The position of the entity (default is { x: 0, y: 0 }).
+   * @param rotation - The rotation of the entity (default is 0).
+   * @param scale - The scale of the entity (default is { x: 1, y: 1 }).
+   */
   constructor({
     position = { x: 0, y: 0 },
     rotation = 0,

@@ -5,9 +5,12 @@ import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 import { settings } from "../data/settings.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { HealthComponent } from "../components/HealthComponent.js"
-import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 
+/**
+ * System responsible for combat mechanics.
+ * @extends {System}
+ */
 export class CombatSystem extends System {
   public entityMap: Map<number, IEntity>
 
@@ -16,6 +19,10 @@ export class CombatSystem extends System {
     this.entityMap = new Map()
   }
 
+  /**
+   * Updates the combat system.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { player, components, entities, deltaTime } = updateContext
 
@@ -70,5 +77,8 @@ export class CombatSystem extends System {
     }
   }
 
+  /**
+   * Clears the combat system
+   */
   clear(): void {}
 }

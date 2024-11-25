@@ -10,6 +10,10 @@ import { PhysicsComponent } from "../components/PhysicsComponent.js"
 
 const INTERACTION_DISTANCE = 25
 
+/**
+ * Manages interactions between entities.
+ * @extends {System}
+ */
 export class InteractionSystem extends System {
   public entityMap: Map<number, IEntity>
 
@@ -18,6 +22,10 @@ export class InteractionSystem extends System {
     this.entityMap = new Map()
   }
 
+  /**
+   * Detects if an entity is in reach of another entity.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { player, components, entities } = updateContext
 
@@ -84,5 +92,8 @@ export class InteractionSystem extends System {
     )
   }
 
+  /**
+   * Clears the interaction system
+   */
   clear(): void {}
 }

@@ -1,5 +1,9 @@
 import { IComponent } from "../ecs/Component"
 
+/**
+ * Represents a component that deals with projectiles in the game.
+ * @implements {IComponent}
+ */
 export class ProjectileComponent implements IComponent {
   public damage: number
   public speed: number
@@ -8,6 +12,16 @@ export class ProjectileComponent implements IComponent {
   public target: number
   public hasHit: boolean
 
+  /**
+   * Creates an instance of ProjectileComponent.
+   *
+   * @param damage - The amount of damage (default is 10).
+   * @param speed - The speed of the projectile (default is 1).
+   * @param range - The range of the projectile (default is 1).
+   * @param distanceTraveled - The distance the projectile has traveled (default is 0).
+   * @param target - The target of the projectile (default is 0).
+   * @param hasHit - Whether the projectile has hit its target (default is false).
+   */
   constructor({
     damage = 10,
     speed = 1,

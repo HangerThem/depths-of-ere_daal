@@ -10,10 +10,18 @@ import { HealthComponent } from "../components/HealthComponent.js"
 import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
 
+/**
+ * System responsible for rendering entities.
+ * @extends {System}
+ */
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
   private entityMap: Map<number, IEntity>
 
+  /**
+   * Creates an instance of RenderSystem.
+   * @param ctx The canvas rendering context.
+   */
   constructor(ctx: CanvasRenderingContext2D) {
     super()
     this.ctx = ctx
@@ -31,6 +39,10 @@ export class RenderSystem extends System {
     this.ctx.canvas.height = window.innerHeight
   }
 
+  /**
+   * Updates the render system.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { entities, components } = updateContext
 
@@ -215,5 +227,8 @@ export class RenderSystem extends System {
     }
   }
 
+  /**
+   * Clears the canvas.
+   */
   clear(): void {}
 }

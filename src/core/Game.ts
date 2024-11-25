@@ -32,12 +32,18 @@ class Game implements IGame {
     )
   }
 
+  /**
+   * Starts the game.
+   */
   public start() {
     this.lastFrameTime = performance.now()
     this.sceneManager.loadScene(new MainMenuScene())
     this.update(this.lastFrameTime)
   }
 
+  /**
+   * Stops the game.
+   */
   public stop() {
     if (this.animationFrameId !== null) {
       window.cancelAnimationFrame(this.animationFrameId)

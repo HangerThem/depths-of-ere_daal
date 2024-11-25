@@ -2,6 +2,9 @@ import { System } from "../ecs/System.js"
 import { InputComponent } from "../components/InputComponent.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
+/**
+ * The input system.
+ */
 export class InputSystem extends System {
   constructor() {
     super()
@@ -150,6 +153,10 @@ export class InputSystem extends System {
     this.gamepad.connected = false
   }
 
+  /**
+   * Updates the input system
+   * @param updateContext
+   */
   update(updateContext: IUpdateContext): void {
     const { components } = updateContext
 
@@ -164,6 +171,9 @@ export class InputSystem extends System {
     }
   }
 
+  /**
+   * Clears the input system
+   */
   clear(): void {
     this.keyboard.clear()
     window.removeEventListener("keydown", this.onKeyDown)

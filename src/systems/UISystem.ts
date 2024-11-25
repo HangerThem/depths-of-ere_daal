@@ -3,6 +3,10 @@ import { ButtonComponent } from "../components/ButtonComponent.js"
 import { IComponentManager } from "../types/ecs/IComponentManager.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 
+/**
+ * Manages UI interactions.
+ * @extends {System}
+ */
 export class UISystem extends System {
   private mousePos: { x: number; y: number }
   private isMousePressed: boolean
@@ -10,6 +14,10 @@ export class UISystem extends System {
   private components: IComponentManager | undefined
   private canvas: HTMLCanvasElement
 
+  /**
+   * Creates an instance of UISystem.
+   * @param canvas The canvas element.
+   */
   constructor(canvas: HTMLCanvasElement) {
     super()
     this.mousePos = { x: 0, y: 0 }
@@ -70,6 +78,10 @@ export class UISystem extends System {
     }
   }
 
+  /**
+   * Updates the UI system.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { components } = updateContext
 
@@ -103,6 +115,9 @@ export class UISystem extends System {
     this.wasMousePressed = this.isMousePressed
   }
 
+  /**
+   * Clears the UI system.
+   */
   clear(): void {
     this.components = undefined
     document.body.style.cursor = "default"

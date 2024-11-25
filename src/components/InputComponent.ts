@@ -1,5 +1,9 @@
 import { IComponent } from "../ecs/Component.js"
 
+/**
+ * InputComponent is a component that stores the current state of the input devices.
+ * @implements {IComponent}
+ */
 export class InputComponent implements IComponent {
   public keyboard: Set<string> = new Set()
 

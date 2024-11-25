@@ -1,11 +1,18 @@
 import { IComponent } from "../ecs/Component"
 
+/**
+ * Represents the different types of weapons that can be used in the game.
+ */
 export enum WeaponType {
   SWORD,
   BOW,
   STAFF,
 }
 
+/**
+ * Represents a component that deals with the weapon of an entity.
+ * @implements {IComponent}
+ */
 export class WeaponComponent implements IComponent {
   public type: WeaponType
   public damage: number

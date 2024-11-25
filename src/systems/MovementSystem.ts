@@ -5,18 +5,34 @@ import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
 import { settings } from "../data/settings.js"
 import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { HealthComponent } from "../components/HealthComponent.js"
+import { IEntity } from "../types/ecs/IEntity.js"
 
+/**
+ * System responsible for moving entities.
+ * @extends {System}
+ */
 export class MovementSystem extends System {
+  private entityMap: Map<number, IEntity>
+
+  constructor() {
+    super()
+    this.entityMap = new Map()
+  }
+
+  /**
+   * Updates the movement system.
+   * @param updateContext The update context.
+   */
   update(updateContext: IUpdateContext): void {
     const { deltaTime, components, entities } = updateContext
 
     const physics = components.getComponents(PhysicsComponent)
     if (!physics) return
 
-    const entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
+    this.entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
 
     for (const [entityId, physic] of physics) {
-      const entity = entityMap.get(entityId)
+      const entity = this.entityMap.get(entityId)
       if (!entity) continue
 
       const transform = components.getComponent(entity, TransformComponent)
@@ -51,8 +67,8 @@ export class MovementSystem extends System {
           transform.scale.x = -1
         }
 
-        const x = physic.velocity.vx * updateContext.deltaTime
-        const y = physic.velocity.vy * updateContext.deltaTime
+        const x = physic.velocity.vx * deltaTime
+        const y = physic.velocity.vy * deltaTime
 
         transform.move(x, y, speed)
 
@@ -61,5 +77,8 @@ export class MovementSystem extends System {
     }
   }
 
+  /**
+   * Clears the entity map.
+   */
   clear(): void {}
 }
