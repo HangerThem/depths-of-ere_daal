@@ -10,6 +10,11 @@ export class RenderableComponent implements IComponent {
   public color: string
   public sprite: string
   public layer: number
+  public isAnimated: boolean
+  public frameCount: number
+  public animationSpeed: number
+  public animationFrame: number
+  public elapsedTime: number = 0
 
   /**
    * Creates an instance of RenderableComponent.
@@ -26,11 +31,30 @@ export class RenderableComponent implements IComponent {
     color = "#ffffff",
     sprite = "",
     layer = 0,
+    isAnimated = false,
+    frameCount = 0,
+    animationSpeed = 0,
+    animationFrame = 0,
   } = {}) {
     this.width = width
     this.height = height
     this.color = color
     this.sprite = sprite
     this.layer = layer
+    this.isAnimated = isAnimated
+    this.frameCount = frameCount
+    this.animationSpeed = animationSpeed
+    this.animationFrame = animationFrame
+  }
+
+  public update(deltaTime: number) {
+    this.elapsedTime += deltaTime
+
+    const timePerFrame = 1 / this.animationSpeed
+
+    while (this.elapsedTime >= timePerFrame) {
+      this.animationFrame = (this.animationFrame + 1) % this.frameCount
+      this.elapsedTime -= timePerFrame
+    }
   }
 }

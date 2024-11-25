@@ -110,9 +110,12 @@ export class GameScene extends Scene {
     this.componentManager.addComponent(
       playerEntity,
       new RenderableComponent({
-        width: 30,
-        height: 51,
+        width: 64,
+        height: 96,
         sprite: "player",
+        isAnimated: true,
+        frameCount: 4,
+        animationSpeed: 4,
         layer: 1,
       })
     )
@@ -127,7 +130,7 @@ export class GameScene extends Scene {
       playerEntity,
       new PhysicsComponent({
         speed: 2.5,
-        collisionBox: { width: 30, height: 16, offsetX: 0, offsetY: 35 },
+        collisionBox: { width: 64, height: 30, offsetX: 0, offsetY: 66 },
         collisionFlag: CollisionFlags.SOLID,
       })
     )

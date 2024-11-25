@@ -49,7 +49,7 @@ export class RenderSystem extends System {
    * @param updateContext The update context.
    */
   update(updateContext: IUpdateContext): void {
-    const { entities, components } = updateContext
+    const { deltaTime, entities, components } = updateContext
     this.ctx.imageSmoothingEnabled = false
 
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
@@ -72,12 +72,25 @@ export class RenderSystem extends System {
             entityA,
             TransformComponent
           )
+          const aRenderable = components.getComponent(
+            entityA,
+            RenderableComponent
+          )
           const bTransform = components.getComponent(
             entityB,
             TransformComponent
           )
-          if (!aTransform || !bTransform) return 0
-          return aTransform.position.y - bTransform.position.y
+          const bRenderable = components.getComponent(
+            entityB,
+            RenderableComponent
+          )
+          if (!aTransform || !bTransform || !aRenderable || !bRenderable)
+            return 0
+          return (
+            aTransform.position.y +
+            (aRenderable?.height ?? 0) -
+            (bTransform.position.y + (bRenderable?.height ?? 0))
+          )
         })
       )
 
@@ -132,16 +145,6 @@ export class RenderSystem extends System {
           const asset = this.assetLoader.getAsset(renderable.sprite)
           if (asset instanceof HTMLImageElement) {
             this.ctx.save()
-            this.ctx.scale(transform.scale.x, transform.scale.y)
-            if (transform.scale.x < 0) {
-              this.ctx.translate(-renderable.width, 0)
-            }
-            if (transform.scale.y < 0) {
-              this.ctx.translate(0, -renderable.height)
-            }
-            if (transform.scale.x < 0 && transform.scale.y < 0) {
-              this.ctx.translate(-renderable.width, -renderable.height)
-            }
             if (physic && physic.isMoving) {
               const speed = physic.slow ? 200 : 100
               this.ctx.translate(
@@ -149,7 +152,49 @@ export class RenderSystem extends System {
                 Math.cos(performance.now() / speed) * 2
               )
             }
-            this.ctx.drawImage(asset, 0, 0, renderable.width, renderable.height)
+            if (!renderable.isAnimated) {
+              this.ctx.scale(transform.scale.x, transform.scale.y)
+              if (transform.scale.x < 0) {
+                this.ctx.translate(-renderable.width, 0)
+              }
+              if (transform.scale.y < 0) {
+                this.ctx.translate(0, -renderable.height)
+              }
+              if (transform.scale.x < 0 && transform.scale.y < 0) {
+                this.ctx.translate(-renderable.width, -renderable.height)
+              }
+              this.ctx.drawImage(
+                asset,
+                0,
+                0,
+                renderable.width,
+                renderable.height
+              )
+            } else {
+              const frameWidth = asset.width / renderable.frameCount
+              this.ctx.scale(transform.scale.x, transform.scale.y)
+              if (transform.scale.x < 0) {
+                this.ctx.translate(-renderable.width, 0)
+              }
+              if (transform.scale.y < 0) {
+                this.ctx.translate(0, -renderable.height)
+              }
+              if (transform.scale.x < 0 && transform.scale.y < 0) {
+                this.ctx.translate(-renderable.width, -renderable.height)
+              }
+              this.ctx.drawImage(
+                asset,
+                renderable.animationFrame * frameWidth,
+                0,
+                frameWidth,
+                asset.height,
+                0,
+                0,
+                renderable.width,
+                renderable.height
+              )
+              renderable.update(deltaTime)
+            }
             this.ctx.restore()
           } else {
             console.error(
