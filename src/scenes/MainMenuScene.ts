@@ -32,12 +32,4 @@ export class MainMenuScene extends Scene {
       new TransformComponent({ position: { x: 100, y: 100 } })
     )
   }
-
-  update(deltaTime: number): void {
-    super.update(deltaTime)
-  }
-
-  cleanup(): void {
-    super.cleanup.bind(this)()
-  }
 }

@@ -1,5 +1,7 @@
+import { AssetManager } from "../core/AssetManager.js"
 import { IScene } from "../types/scenes/IScene.js"
 import { ISceneManager } from "../types/scenes/ISceneManager.js"
+import { LoadingScene } from "./LoadingScene.js"
 
 /**
  * SceneManager class that can be used to manage scenes.
@@ -7,13 +9,16 @@ import { ISceneManager } from "../types/scenes/ISceneManager.js"
  */
 export class SceneManager implements ISceneManager {
   private currentScene: IScene | null = null
+  private assetManager: AssetManager
 
   /**
    * Creates an instance of SceneManager.
    *
    * @param canvasId - The ID of the canvas element.
    */
-  constructor(private canvasId: string) {}
+  constructor(private canvasId: string) {
+    this.assetManager = AssetManager.getInstance()
+  }
 
   /**
    * Loads a new scene into the game.
@@ -24,8 +29,27 @@ export class SceneManager implements ISceneManager {
     if (this.currentScene) {
       this.currentScene.cleanup()
     }
-    this.currentScene = scene
-    this.currentScene.initialize(this.canvasId, this.loadScene.bind(this))
+
+    this.assetManager.unloadAssets()
+    this.loadLoadingScene(scene)
+  }
+
+  /**
+   * Loads the loading scene.
+   *
+   * @param scene - The scene to load.
+   */
+  private loadLoadingScene(scene: IScene): void {
+    const loadingScene = new LoadingScene()
+    loadingScene.initialize(this.canvasId, this.loadScene.bind(this))
+    this.currentScene = loadingScene
+
+    this.assetManager.onComplete(() => {
+      this.currentScene = scene
+      this.currentScene.initialize(this.canvasId, this.loadScene.bind(this))
+    })
+
+    this.assetManager.loadAssets(scene.assets)
   }
 
   /**

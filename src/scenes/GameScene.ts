@@ -1,8 +1,5 @@
 import { InputComponent } from "../components/InputComponent.js"
-import {
-  RenderableComponent,
-  Shape,
-} from "../components/RenderableComponent.js"
+import { RenderableComponent } from "../components/RenderableComponent.js"
 import { TransformComponent } from "../components/TransformComponent.js"
 import {
   CollisionFlags,
@@ -48,6 +45,14 @@ export class GameScene extends Scene {
   private player: IEntity | null = null
   constructor() {
     super("game")
+    this.assets = {
+      player: "/assets/player.png",
+      box: "/assets/box.png",
+      slime: "/assets/slime.png",
+      wall: "/assets/wall.png",
+      health: "/assets/health.png",
+      damage: "/assets/damage.png",
+    }
   }
 
   initialize(canvasId: string, loadScene: (scene: IScene) => void): void {
@@ -61,10 +66,7 @@ export class GameScene extends Scene {
 
     this.createLevel()
 
-    this.addBox(200, 200, 50, 50, "#f00", 30, CollisionFlags.SOLID)
-
-    const playerSprite = new Image()
-    playerSprite.src = "/assets/player.png"
+    this.addBox(4 * 48, 4 * 48, 48, 48, "box", 30, CollisionFlags.SOLID)
 
     const playerEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
@@ -74,10 +76,9 @@ export class GameScene extends Scene {
     this.componentManager.addComponent(
       playerEntity,
       new RenderableComponent({
-        shape: Shape.SPRITE,
-        width: 50,
-        height: 50,
-        sprite: playerSprite,
+        width: 48,
+        height: 48,
+        sprite: "player",
       })
     )
     this.componentManager.addComponent(
@@ -91,7 +92,7 @@ export class GameScene extends Scene {
       playerEntity,
       new PhysicsComponent({
         speed: 2.5,
-        collisionBox: { width: 50, height: 50 },
+        collisionBox: { width: 48, height: 48 },
         collisionFlag: CollisionFlags.SOLID,
       })
     )
@@ -105,7 +106,7 @@ export class GameScene extends Scene {
     y: number,
     width: number,
     height: number,
-    color: string,
+    sprite: string,
     health: number,
     collisionFlag: CollisionFlags
   ): void {
@@ -116,7 +117,7 @@ export class GameScene extends Scene {
     )
     this.componentManager.addComponent(
       entity,
-      new RenderableComponent({ shape: Shape.SQUARE, width, height, color })
+      new RenderableComponent({ width, height, sprite })
     )
     this.componentManager.addComponent(
       entity,
@@ -139,22 +140,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 50, y: y * 50 },
+              position: { x: x * 48, y: y * 48 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              shape: Shape.SQUARE,
-              width: 50,
-              height: 50,
-              color: "#555",
+              width: 48,
+              height: 48,
+              sprite: "wall",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 50, height: 50 },
+              collisionBox: { width: 48, height: 48 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -163,22 +163,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 50, y: y * 50 },
+              position: { x: x * 48, y: y * 48 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              shape: Shape.SQUARE,
-              width: 50,
-              height: 50,
-              color: "#050",
+              width: 48,
+              height: 48,
+              sprite: "slime",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 50, height: 50 },
+              collisionBox: { width: 48, height: 48 },
               collisionFlag: CollisionFlags.SEMISOLID,
             })
           )
@@ -187,22 +186,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 50, y: y * 50 },
+              position: { x: x * 48, y: y * 48 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              shape: Shape.SQUARE,
-              width: 50,
-              height: 50,
-              color: "#ff0",
+              width: 48,
+              height: 48,
+              sprite: "health",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 50, height: 50 },
+              collisionBox: { width: 48, height: 48 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -221,22 +219,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 50, y: y * 50 },
+              position: { x: x * 48, y: y * 48 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              shape: Shape.SQUARE,
-              width: 50,
-              height: 50,
-              color: "#f00",
+              width: 48,
+              height: 48,
+              sprite: "damage",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 50, height: 50 },
+              collisionBox: { width: 48, height: 48 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )

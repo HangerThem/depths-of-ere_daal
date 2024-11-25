@@ -18,7 +18,7 @@ export class Scene implements IScene {
   protected canvas: HTMLCanvasElement | null = null
   protected ctx: CanvasRenderingContext2D | null = null
   protected loadScene!: (scene: IScene) => void
-  protected assets: any
+  public assets: Record<string, string>
 
   /**
    * Creates an instance of Scene.

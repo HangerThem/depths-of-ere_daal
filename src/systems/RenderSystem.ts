@@ -3,12 +3,12 @@ import { TransformComponent } from "../components/TransformComponent.js"
 import { RenderableComponent } from "../components/RenderableComponent.js"
 import { ButtonComponent } from "../components/ButtonComponent.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext.js"
-import { Shape } from "../components/RenderableComponent.js"
 import { PropComponent } from "../components/PropComponent.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { HealthComponent } from "../components/HealthComponent.js"
 import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
+import { AssetManager } from "../core/AssetManager.js"
 
 /**
  * System responsible for rendering entities.
@@ -17,6 +17,7 @@ import { WeaponComponent } from "../components/WeaponComponent.js"
 export class RenderSystem extends System {
   private ctx: CanvasRenderingContext2D
   private entityMap: Map<number, IEntity>
+  private assetLoader: AssetManager
 
   /**
    * Creates an instance of RenderSystem.
@@ -25,9 +26,10 @@ export class RenderSystem extends System {
   constructor(ctx: CanvasRenderingContext2D) {
     super()
     this.ctx = ctx
-    this.entityMap = new Map()
+    this.assetLoader = AssetManager.getInstance()
     this.initListeners()
     this.onResize()
+    this.entityMap = new Map()
   }
 
   private initListeners() {
@@ -50,12 +52,30 @@ export class RenderSystem extends System {
     this.ctx.fillStyle = "#333"
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
 
-    const renderables = components.getComponents(RenderableComponent)
+    let renderables = components.getComponents(RenderableComponent)
     const buttons = components.getComponents(ButtonComponent)
 
     this.entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
 
     if (renderables) {
+      renderables = new Map(
+        [...renderables].sort((a, b) => {
+          const entityA = this.entityMap.get(a[0])
+          const entityB = this.entityMap.get(b[0])
+          if (!entityA || !entityB) return 0
+          const aTransform = components.getComponent(
+            entityA,
+            TransformComponent
+          )
+          const bTransform = components.getComponent(
+            entityB,
+            TransformComponent
+          )
+          if (!aTransform || !bTransform) return 0
+          return aTransform.position.y - bTransform.position.y
+        })
+      )
+
       for (const [entityId, renderable] of renderables) {
         const entity = this.entityMap.get(entityId)
         if (!entity) continue
@@ -81,25 +101,9 @@ export class RenderSystem extends System {
 
         this.ctx.strokeStyle = strokeColor
 
-        switch (renderable.shape) {
-          case Shape.SQUARE:
-            this.ctx.fillRect(0, 0, renderable.width, renderable.height)
-            this.ctx.strokeRect(0, 0, renderable.width, renderable.height)
-            break
-          case Shape.CIRCLE:
-            this.ctx.beginPath()
-            this.ctx.arc(
-              renderable.width / 2,
-              renderable.height / 2,
-              renderable.width / 2,
-              0,
-              Math.PI * 2
-            )
-            this.ctx.fill()
-            break
-          case Shape.SPRITE:
-            if (!renderable.sprite) break
-
+        if (renderable.sprite) {
+          const asset = this.assetLoader.getAsset(renderable.sprite)
+          if (asset instanceof HTMLImageElement) {
             this.ctx.save()
             this.ctx.scale(transform.scale.x, transform.scale.y)
             if (transform.scale.x < 0) {
@@ -118,18 +122,15 @@ export class RenderSystem extends System {
                 Math.cos(performance.now() / speed) * 2
               )
             }
-            this.ctx.drawImage(
-              renderable.sprite,
-              0,
-              0,
-              renderable.width,
-              renderable.height
-            )
+            this.ctx.drawImage(asset, 0, 0, renderable.width, renderable.height)
             this.ctx.restore()
-
-            break
-          default:
-            break
+          } else {
+            console.error(
+              `Asset for sprite '${renderable.sprite}' is not a valid HTMLImageElement. Got: ${asset}`
+            )
+          }
+        } else {
+          this.ctx.fillRect(0, 0, renderable.width, renderable.height)
         }
 
         if (health) {
