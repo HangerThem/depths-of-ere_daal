@@ -19,6 +19,8 @@ import { CombatSystem } from "../systems/CombatSystem.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
 import { CameraSystem } from "../systems/CameraSystem.js"
 import { CameraComponent } from "../components/CameraComponent.js"
+import { SoundSystem } from "../systems/SoundSystem.js"
+import { SoundComponent } from "../components/SoundComponent.js"
 
 const LEVEL = [
   "####################",
@@ -54,6 +56,9 @@ export class GameScene extends Scene {
       wall: "/assets/wall.png",
       health: "/assets/health.png",
       damage: "/assets/damage.png",
+      soundtrack: "/assets/soundtrack.wav",
+      damageSound: "/assets/damage.wav",
+      healthSound: "/assets/health.wav",
     }
   }
 
@@ -66,8 +71,34 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new CollisionSystem())
     this.systemManager.addSystem(new CombatSystem())
     this.systemManager.addSystem(new CameraSystem())
+    this.systemManager.addSystem(new SoundSystem())
 
-    this.createLevel()
+    const soundtrack = this.entityManager.createEntity()
+    this.componentManager.addComponent(
+      soundtrack,
+      new SoundComponent({ name: "soundtrack", loop: true, isPlaying: true })
+    )
+    const health = this.entityManager.createEntity()
+    this.componentManager.addComponent(
+      health,
+      new SoundComponent({
+        name: "healthSound",
+        isPlaying: false,
+        playOnce: true,
+      })
+    )
+
+    const damage = this.entityManager.createEntity()
+    this.componentManager.addComponent(
+      damage,
+      new SoundComponent({
+        name: "damageSound",
+        isPlaying: false,
+        playOnce: true,
+      })
+    )
+
+    this.createLevel(health, damage)
 
     this.addBox(3 * 64, 4 * 64, 64, 64, "box", 30, CollisionFlags.SOLID)
 
@@ -154,7 +185,7 @@ export class GameScene extends Scene {
     )
   }
 
-  private createLevel(): void {
+  private createLevel(health: IEntity, damage: IEntity): void {
     for (let y = 0; y < LEVEL.length; y++) {
       for (let x = 0; x < LEVEL[y].length; x++) {
         if (LEVEL[y][x] === "#") {
@@ -217,12 +248,13 @@ export class GameScene extends Scene {
               width: 64,
               height: 64,
               sprite: "health",
+              layer: 1,
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
+              collisionBox: { width: 64, height: 24, offsetX: 0, offsetY: 40 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -233,6 +265,9 @@ export class GameScene extends Scene {
                 this.componentManager
                   .getComponent(this.player!!, HealthComponent)
                   ?.heal(10)
+                this.componentManager
+                  .getComponent(health, SoundComponent)
+                  ?.play()
               },
             })
           )
@@ -250,12 +285,13 @@ export class GameScene extends Scene {
               width: 64,
               height: 64,
               sprite: "damage",
+              layer: 1,
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
+              collisionBox: { width: 64, height: 24, offsetX: 0, offsetY: 40 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -266,6 +302,9 @@ export class GameScene extends Scene {
                 this.componentManager
                   .getComponent(this.player!!, HealthComponent)
                   ?.takeDamage(10)
+                this.componentManager
+                  .getComponent(damage, SoundComponent)
+                  ?.play()
               },
             })
           )

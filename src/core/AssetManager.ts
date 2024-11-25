@@ -57,8 +57,13 @@ export class AssetManager {
   private loadAudio(key: string, url: string): void {
     fetch(url)
       .then((response) => response.arrayBuffer())
-      .then((buffer) => this.audioContext.decodeAudioData(buffer))
-      .then((decodedData) => this.assetLoaded(key, decodedData))
+      .then((buffer) => {
+        this.audioContext.decodeAudioData(
+          buffer,
+          (audioBuffer) => this.assetLoaded(key, audioBuffer),
+          (error) => console.error(`Failed to decode audio: ${url}`, error)
+        )
+      })
       .catch((error) => console.error(`Failed to load audio: ${url}`, error))
   }
 

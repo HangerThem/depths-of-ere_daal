@@ -72,17 +72,29 @@ export class InteractionSystem extends System {
     if (!playerTransform || !propTransform) return false
     if (!playerPhysics || !propPhysics) return false
 
-    const playerTop = playerTransform.position.y
+    const playerTop =
+      playerTransform.position.y + playerPhysics.collisionBox.offsetY
     const playerBottom =
-      playerTransform.position.y + playerPhysics.collisionBox.width
-    const playerLeft = playerTransform.position.x
+      playerTransform.position.y +
+      playerPhysics.collisionBox.height +
+      playerPhysics.collisionBox.offsetY
+    const playerLeft =
+      playerTransform.position.x + playerPhysics.collisionBox.offsetX
     const playerRight =
-      playerTransform.position.x + playerPhysics.collisionBox.height
+      playerTransform.position.x +
+      playerPhysics.collisionBox.width +
+      playerPhysics.collisionBox.offsetX
 
-    const propTop = propTransform.position.y
-    const propBottom = propTransform.position.y + propPhysics.collisionBox.width
-    const propLeft = propTransform.position.x
-    const propRight = propTransform.position.x + propPhysics.collisionBox.height
+    const propTop = propTransform.position.y + propPhysics.collisionBox.offsetY
+    const propBottom =
+      propTransform.position.y +
+      propPhysics.collisionBox.height +
+      propPhysics.collisionBox.offsetY
+    const propLeft = propTransform.position.x + propPhysics.collisionBox.offsetX
+    const propRight =
+      propTransform.position.x +
+      propPhysics.collisionBox.width +
+      propPhysics.collisionBox.offsetX
 
     return (
       playerTop - INTERACTION_DISTANCE <= propBottom &&
