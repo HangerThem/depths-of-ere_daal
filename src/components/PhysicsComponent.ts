@@ -8,6 +8,8 @@ export type Velocity = {
 export type CollisionBox = {
   width: number
   height: number
+  offsetX: number
+  offsetY: number
 }
 
 /**
@@ -43,7 +45,7 @@ export class PhysicsComponent implements IComponent {
     velocity = { vx: 0, vy: 0 },
     speed = 0,
     slow = false,
-    collisionBox = { width: 0, height: 0 },
+    collisionBox = { width: 0, height: 0, offsetX: 0, offsetY: 0 },
     collisionFlag = CollisionFlags.NONE,
   } = {}) {
     this.velocity = velocity
@@ -63,19 +65,6 @@ export class PhysicsComponent implements IComponent {
 
   public isSemiSolid() {
     return this.collisionFlag === CollisionFlags.SEMISOLID
-  }
-
-  public isCollidingWith(
-    positionA: { x: number; y: number },
-    positionB: { x: number; y: number },
-    collisionBoxB: CollisionBox
-  ) {
-    return (
-      positionA.x < positionB.x + collisionBoxB.width &&
-      positionA.x + this.collisionBox.width > positionB.x &&
-      positionA.y < positionB.y + collisionBoxB.height &&
-      positionA.y + this.collisionBox.height > positionB.y
-    )
   }
 
   public stop() {

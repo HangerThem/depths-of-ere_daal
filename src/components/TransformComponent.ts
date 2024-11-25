@@ -35,7 +35,7 @@ export class TransformComponent implements IComponent {
     return this._rotation
   }
 
-  set rotation(value) {
+  public setRotatio(value: number) {
     if (value < 0) {
       this._rotation = 360 + value
     } else if (value >= 360) {
@@ -54,5 +54,10 @@ export class TransformComponent implements IComponent {
 
     this.position.x += x * speed
     this.position.y += y * speed
+  }
+
+  public moveTo(x: number, y: number) {
+    this.position.x = x
+    this.position.y = y
   }
 }

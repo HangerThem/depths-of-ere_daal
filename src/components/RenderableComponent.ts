@@ -9,6 +9,7 @@ export class RenderableComponent implements IComponent {
   public height: number
   public color: string
   public sprite: string
+  public layer: number
 
   /**
    * Creates an instance of RenderableComponent.
@@ -19,10 +20,17 @@ export class RenderableComponent implements IComponent {
    * @param color - The fallback color of the entity (default is "#ffffff").
    * @param sprite - The sprite of the entity (default is an empty string).
    */
-  constructor({ width = 0, height = 0, color = "#ffffff", sprite = "" } = {}) {
+  constructor({
+    width = 0,
+    height = 0,
+    color = "#ffffff",
+    sprite = "",
+    layer = 0,
+  } = {}) {
     this.width = width
     this.height = height
     this.color = color
     this.sprite = sprite
+    this.layer = layer
   }
 }

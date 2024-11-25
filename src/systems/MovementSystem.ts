@@ -24,7 +24,7 @@ export class MovementSystem extends System {
    * @param updateContext The update context.
    */
   update(updateContext: IUpdateContext): void {
-    const { deltaTime, components, entities } = updateContext
+    const { player, deltaTime, components, entities } = updateContext
 
     const physics = components.getComponents(PhysicsComponent)
     if (!physics) return
@@ -60,11 +60,11 @@ export class MovementSystem extends System {
         }
         if (input.keyboard.has(settings.controls.left)) {
           physic.velocity.vx = -speed
-          transform.scale.x = 1
+          transform.scale.x = -1
         }
         if (input.keyboard.has(settings.controls.right)) {
           physic.velocity.vx = speed
-          transform.scale.x = -1
+          transform.scale.x = 1
         }
 
         const x = physic.velocity.vx * deltaTime

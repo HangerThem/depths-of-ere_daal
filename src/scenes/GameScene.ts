@@ -17,6 +17,8 @@ import { IScene } from "../types/scenes/IScene.js"
 import { PropComponent } from "../components/PropComponent.js"
 import { CombatSystem } from "../systems/CombatSystem.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
+import { CameraSystem } from "../systems/CameraSystem.js"
+import { CameraComponent } from "../components/CameraComponent.js"
 
 const LEVEL = [
   "####################",
@@ -63,10 +65,11 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new InteractionSystem())
     this.systemManager.addSystem(new CollisionSystem())
     this.systemManager.addSystem(new CombatSystem())
+    this.systemManager.addSystem(new CameraSystem())
 
     this.createLevel()
 
-    this.addBox(4 * 48, 4 * 48, 48, 48, "box", 30, CollisionFlags.SOLID)
+    this.addBox(3 * 64, 4 * 64, 64, 64, "box", 30, CollisionFlags.SOLID)
 
     const playerEntity = this.entityManager.createEntity()
     this.componentManager.addComponent(
@@ -76,9 +79,10 @@ export class GameScene extends Scene {
     this.componentManager.addComponent(
       playerEntity,
       new RenderableComponent({
-        width: 48,
-        height: 48,
+        width: 30,
+        height: 51,
         sprite: "player",
+        layer: 1,
       })
     )
     this.componentManager.addComponent(
@@ -92,13 +96,26 @@ export class GameScene extends Scene {
       playerEntity,
       new PhysicsComponent({
         speed: 2.5,
-        collisionBox: { width: 48, height: 48 },
+        collisionBox: { width: 30, height: 16, offsetX: 0, offsetY: 35 },
         collisionFlag: CollisionFlags.SOLID,
       })
     )
     this.componentManager.addComponent(playerEntity, new InputComponent())
     this.componentManager.addComponent(playerEntity, new WeaponComponent())
     this.player = playerEntity
+
+    const cameraEntity = this.entityManager.createEntity()
+    this.componentManager.addComponent(
+      cameraEntity,
+      new TransformComponent({ position: { x: 0, y: 0 } })
+    )
+
+    this.componentManager.addComponent(
+      cameraEntity,
+      new CameraComponent({
+        targetEntityId: playerEntity.id,
+      })
+    )
   }
 
   private addBox(
@@ -117,12 +134,17 @@ export class GameScene extends Scene {
     )
     this.componentManager.addComponent(
       entity,
-      new RenderableComponent({ width, height, sprite })
+      new RenderableComponent({ width, height, sprite, layer: 1 })
     )
     this.componentManager.addComponent(
       entity,
       new PhysicsComponent({
-        collisionBox: { width, height },
+        collisionBox: {
+          width: 64,
+          height: height - 40,
+          offsetX: 0,
+          offsetY: 40,
+        },
         collisionFlag,
       })
     )
@@ -140,21 +162,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 48, y: y * 48 },
+              position: { x: x * 64, y: y * 64 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              width: 48,
-              height: 48,
+              width: 64,
+              height: 64,
               sprite: "wall",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 48, height: 48 },
+              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -163,21 +185,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 48, y: y * 48 },
+              position: { x: x * 64, y: y * 64 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              width: 48,
-              height: 48,
+              width: 64,
+              height: 64,
               sprite: "slime",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 48, height: 48 },
+              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
               collisionFlag: CollisionFlags.SEMISOLID,
             })
           )
@@ -186,21 +208,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 48, y: y * 48 },
+              position: { x: x * 64, y: y * 64 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              width: 48,
-              height: 48,
+              width: 64,
+              height: 64,
               sprite: "health",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 48, height: 48 },
+              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )
@@ -219,21 +241,21 @@ export class GameScene extends Scene {
           this.componentManager.addComponent(
             entity,
             new TransformComponent({
-              position: { x: x * 48, y: y * 48 },
+              position: { x: x * 64, y: y * 64 },
             })
           )
           this.componentManager.addComponent(
             entity,
             new RenderableComponent({
-              width: 48,
-              height: 48,
+              width: 64,
+              height: 64,
               sprite: "damage",
             })
           )
           this.componentManager.addComponent(
             entity,
             new PhysicsComponent({
-              collisionBox: { width: 48, height: 48 },
+              collisionBox: { width: 64, height: 64, offsetX: 0, offsetY: 0 },
               collisionFlag: CollisionFlags.SOLID,
             })
           )

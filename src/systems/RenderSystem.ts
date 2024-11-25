@@ -9,6 +9,9 @@ import { HealthComponent } from "../components/HealthComponent.js"
 import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
 import { AssetManager } from "../core/AssetManager.js"
+import { CameraComponent } from "../components/CameraComponent.js"
+
+const DEBUG_COLLISIONS = false
 
 /**
  * System responsible for rendering entities.
@@ -47,6 +50,7 @@ export class RenderSystem extends System {
    */
   update(updateContext: IUpdateContext): void {
     const { entities, components } = updateContext
+    this.ctx.imageSmoothingEnabled = false
 
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
     this.ctx.fillStyle = "#333"
@@ -54,6 +58,7 @@ export class RenderSystem extends System {
 
     let renderables = components.getComponents(RenderableComponent)
     const buttons = components.getComponents(ButtonComponent)
+    const camera = components.getComponents(CameraComponent)
 
     this.entityMap = new Map([...entities.getEntities()].map((e) => [e.id, e]))
 
@@ -76,6 +81,35 @@ export class RenderSystem extends System {
         })
       )
 
+      renderables = new Map(
+        [...renderables].sort((a, b) => {
+          const entityA = this.entityMap.get(a[0])
+          const entityB = this.entityMap.get(b[0])
+          if (!entityA || !entityB) return 0
+          const aLayer = components.getComponent(entityA, RenderableComponent)
+          const bLayer = components.getComponent(entityB, RenderableComponent)
+          if (!aLayer || !bLayer) return 0
+          return aLayer.layer - bLayer.layer
+        })
+      )
+
+      this.ctx.save()
+
+      if (camera) {
+        for (const [entityId, cameraComponent] of camera) {
+          const entity = this.entityMap.get(entityId)
+          if (!entity) continue
+
+          const transform = components.getComponent(entity, TransformComponent)
+          if (!transform) continue
+
+          this.ctx.translate(
+            -transform.position.x + this.ctx.canvas.width / 2,
+            -transform.position.y + this.ctx.canvas.height / 2
+          )
+        }
+      }
+
       for (const [entityId, renderable] of renderables) {
         const entity = this.entityMap.get(entityId)
         if (!entity) continue
@@ -88,18 +122,11 @@ export class RenderSystem extends System {
         if (!transform) continue
 
         this.ctx.save()
+
         this.ctx.translate(transform.position.x, transform.position.y)
         this.ctx.rotate(transform.rotation)
 
         this.ctx.fillStyle = renderable.color
-
-        let strokeColor = renderable.color
-
-        if (prop?.isInReach) {
-          strokeColor = "#ff0"
-        }
-
-        this.ctx.strokeStyle = strokeColor
 
         if (renderable.sprite) {
           const asset = this.assetLoader.getAsset(renderable.sprite)
@@ -133,59 +160,82 @@ export class RenderSystem extends System {
           this.ctx.fillRect(0, 0, renderable.width, renderable.height)
         }
 
-        if (health) {
-          this.ctx.fillStyle = "#000"
-          this.ctx.fillRect(-1, renderable.height + 4, renderable.width + 2, 7)
-          this.ctx.fillStyle = "red"
-          this.ctx.fillRect(0, renderable.height + 5, renderable.width, 5)
+        if (!DEBUG_COLLISIONS) {
+          if (health) {
+            this.ctx.fillStyle = "#000"
+            this.ctx.fillRect(
+              -1,
+              renderable.height + 4,
+              renderable.width + 2,
+              7
+            )
+            this.ctx.fillStyle = "red"
+            this.ctx.fillRect(0, renderable.height + 5, renderable.width, 5)
 
-          this.ctx.fillStyle = "green"
-          this.ctx.fillRect(
-            0,
-            renderable.height + 5,
-            (renderable.width * health.health) / health.maxHealth,
-            5
-          )
-        }
+            this.ctx.fillStyle = "green"
+            this.ctx.fillRect(
+              0,
+              renderable.height + 5,
+              (renderable.width * health.health) / health.maxHealth,
+              5
+            )
+          }
 
-        if (weapon) {
-          this.ctx.save()
-          this.ctx.translate(renderable.width / 2, renderable.height / 2)
-          this.ctx.rotate((weapon.cooldown / weapon.attackSpeed) * Math.PI * 2)
-          this.ctx.fillStyle = "black"
-          this.ctx.fillRect(
-            renderable.width / 2 - 5,
-            renderable.height / 2 - 5,
-            10,
-            10
-          )
+          if (weapon) {
+            this.ctx.save()
+            this.ctx.translate(renderable.width / 2, renderable.height / 2)
+            this.ctx.rotate(
+              (weapon.cooldown / weapon.attackSpeed) * Math.PI * 2
+            )
+            this.ctx.fillStyle = "black"
+            this.ctx.fillRect(
+              renderable.width / 2 - 5,
+              renderable.height / 2 - 5,
+              10,
+              10
+            )
 
-          this.ctx.strokeStyle = "black"
-          this.ctx.lineWidth = 2
-          this.ctx.beginPath()
-          this.ctx.moveTo(renderable.width / 2, renderable.height / 2)
-          this.ctx.lineTo(
-            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
-            renderable.height / 2
-          )
-          this.ctx.stroke()
+            this.ctx.strokeStyle = "black"
+            this.ctx.lineWidth = 2
+            this.ctx.beginPath()
+            this.ctx.moveTo(renderable.width / 2, renderable.height / 2)
+            this.ctx.lineTo(
+              renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+              renderable.height / 2
+            )
+            this.ctx.stroke()
 
-          this.ctx.beginPath()
-          this.ctx.moveTo(
-            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
-            renderable.height / 2
-          )
-          this.ctx.lineTo(
-            renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
-            renderable.height / 2 + 5
-          )
-          this.ctx.stroke()
+            this.ctx.beginPath()
+            this.ctx.moveTo(
+              renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+              renderable.height / 2
+            )
+            this.ctx.lineTo(
+              renderable.width / 2 + (transform.scale.x < 0 ? -10 : 10),
+              renderable.height / 2 + 5
+            )
+            this.ctx.stroke()
 
-          this.ctx.restore()
+            this.ctx.restore()
+          }
+        } else {
+          this.ctx.strokeStyle = "#fff"
+          this.ctx.strokeRect(0, 0, renderable.width, renderable.height)
+          if (physic) {
+            this.ctx.strokeStyle = "#f00"
+            this.ctx.strokeRect(
+              physic.collisionBox.offsetX,
+              physic.collisionBox.offsetY,
+              physic.collisionBox.width,
+              physic.collisionBox.height
+            )
+          }
         }
 
         this.ctx.restore()
       }
+
+      this.ctx.restore()
     }
 
     buttons && this.renderUI(buttons)
