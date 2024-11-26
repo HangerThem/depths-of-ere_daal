@@ -21,6 +21,8 @@ import { CameraSystem } from "../systems/CameraSystem.js"
 import { CameraComponent } from "../components/CameraComponent.js"
 import { SoundSystem } from "../systems/SoundSystem.js"
 import { SoundComponent } from "../components/SoundComponent.js"
+import { DestructibleComponent } from "../components/DestructibleComponent.js"
+import { ParticleSystem } from "../systems/ParticleSystem.js"
 
 const LEVEL = [
   "####################",
@@ -69,6 +71,7 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new MovementSystem())
     this.systemManager.addSystem(new InteractionSystem())
     this.systemManager.addSystem(new CollisionSystem())
+    this.systemManager.addSystem(new ParticleSystem(this.ctx!!))
     this.systemManager.addSystem(new CombatSystem())
     this.systemManager.addSystem(new CameraSystem())
     this.systemManager.addSystem(new SoundSystem())
@@ -184,7 +187,7 @@ export class GameScene extends Scene {
     )
     this.componentManager.addComponent(
       entity,
-      new HealthComponent({ health, maxHealth: health })
+      new DestructibleComponent({ health, maxHealth: health })
     )
   }
 

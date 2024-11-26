@@ -6,6 +6,7 @@ import { settings } from "../data/settings.js"
 import { IEntity } from "../types/ecs/IEntity.js"
 import { HealthComponent } from "../components/HealthComponent.js"
 import { TransformComponent } from "../components/TransformComponent.js"
+import { DestructibleComponent } from "../components/DestructibleComponent.js"
 
 /**
  * System responsible for combat mechanics.
@@ -29,6 +30,7 @@ export class CombatSystem extends System {
     const weapons = components.getComponents(WeaponComponent)
     const playerInput = components.getComponent(player!!, InputComponent)
     const healths = components.getComponents(HealthComponent)
+    const destructibles = components.getComponents(DestructibleComponent)
 
     if (!weapons || !player || !playerInput) return
 
@@ -68,6 +70,34 @@ export class CombatSystem extends System {
               if (health.isDead()) {
                 entities.removeEntity(target)
               }
+            }
+          }
+        }
+        if (destructibles) {
+          for (const [destructibleId, destructible] of destructibles) {
+            const wielder = this.entityMap.get(weaponId)
+            const target = this.entityMap.get(destructibleId)
+
+            if (!wielder || !target) continue
+
+            if (wielder.id === target.id) continue
+
+            const wielderTransform = components.getComponent(
+              wielder,
+              TransformComponent
+            )
+            const targetTransform = components.getComponent(
+              target,
+              TransformComponent
+            )
+
+            if (!wielderTransform || !targetTransform) continue
+
+            if (
+              wielderTransform.position.x - targetTransform.position.x < 10 &&
+              wielderTransform.position.y - targetTransform.position.y < 10
+            ) {
+              destructible.takeDamage(weapon.damage)
             }
           }
         }
