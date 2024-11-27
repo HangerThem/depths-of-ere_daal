@@ -5,6 +5,7 @@ import type { Position } from "./TransformComponent"
 export class ParticleComponent implements IComponent {
   public position: Position
   public velocity: Velocity
+  public rotation: number
   public lifetime: number
   public size: number
   public color: string
@@ -12,12 +13,14 @@ export class ParticleComponent implements IComponent {
   constructor({
     position = { x: 0, y: 0 },
     velocity = { vx: 0, vy: 0 },
+    rotation = 0,
     lifetime = 0,
     size = 0,
     color = "#000000",
   } = {}) {
     this.position = position
     this.velocity = velocity
+    this.rotation = rotation
     this.lifetime = lifetime
     this.size = size
     this.color = color
@@ -26,6 +29,7 @@ export class ParticleComponent implements IComponent {
   update(deltaTime: number): boolean {
     this.position.x += this.velocity.vx * deltaTime
     this.position.y += this.velocity.vy * deltaTime
+    this.rotation += 0.1
     this.lifetime -= deltaTime
     return this.lifetime <= 0
   }

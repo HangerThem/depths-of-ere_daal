@@ -3,23 +3,20 @@ import { System } from "../ecs/System.js"
 import { IUpdateContext } from "../types/ecs/IUpdateContext"
 import { DestructibleComponent } from "../components/DestructibleComponent.js"
 import { ParticleComponent } from "../components/ParticleComponent.js"
-import type { Velocity } from "../components/PhysicsComponent"
 import type { Position } from "../components/TransformComponent"
+import { IEntityManager } from "../types/ecs/IEntityManager.js"
+import { IComponentManager } from "../types/ecs/IComponentManager.js"
 
 export class ParticleSystem extends System {
-  private particles: ParticleComponent[] = []
-  private ctx: CanvasRenderingContext2D
-
-  constructor(ctx: CanvasRenderingContext2D) {
+  constructor() {
     super()
-    this.ctx = ctx
   }
 
   update(updateContext: IUpdateContext): void {
     const { components, entities, deltaTime } = updateContext
 
-    const destructibles = components.getComponents(DestructibleComponent)
-    if (!destructibles) return
+    const destructibles =
+      components.getComponents(DestructibleComponent) || new Map()
 
     for (const [entityId, destructible] of destructibles) {
       if (destructible.isDead()) {
@@ -28,12 +25,14 @@ export class ParticleSystem extends System {
 
         const transform = components.getComponent(entity, TransformComponent)
         if (transform) {
-          this.spawnParticle(
+          this.spawnParticles(
             { x: transform.position.x, y: transform.position.y },
-            { vx: 0, vy: 0 },
-            200,
+            2,
             5,
-            "#ff0000"
+            "#ff0000",
+            entities,
+            components,
+            50
           )
         }
 
@@ -41,38 +40,49 @@ export class ParticleSystem extends System {
       }
     }
 
-    this.particles = this.particles.filter((p) => !p.update(deltaTime))
-    this.render()
+    const particles = components.getComponents(ParticleComponent) || new Map()
+
+    for (const [entityId, particle] of particles) {
+      if (particle.update(deltaTime)) {
+        const entity = entities.getEntityById(entityId)
+        entity && entities.removeEntity(entity)
+      }
+    }
   }
 
-  spawnParticle(
+  spawnParticles(
     position: Position,
-    velocity: Velocity,
     lifetime: number,
     size: number,
-    color: string
+    color: string,
+    entities: IEntityManager,
+    components: IComponentManager,
+    numOfParticles: number
   ) {
-    this.particles.push(
-      new ParticleComponent({ position, velocity, lifetime, size, color })
+    const colors = [
+      "#ff0000",
+      "#00ff00",
+      "#0000ff",
+      "#ffff00",
+      "#ff00ff",
+      "#00ffff",
+    ]
+    const particles = Array.from({ length: numOfParticles }).map(() => 
+      entities.createEntity()
     )
-  }
 
-  render() {
-    this.ctx.save()
-    for (const particle of this.particles) {
-      this.ctx.globalAlpha = particle.lifetime / 1000
-      this.ctx.fillStyle = particle.color
-      this.ctx.beginPath()
-      this.ctx.arc(
-        particle.position.x,
-        particle.position.y,
-        particle.size,
-        0,
-        Math.PI * 2
-      )
-      this.ctx.fill()
+    for (const particle of particles) {
+      components.addComponent(particle, new ParticleComponent({
+        position: { x: position.x, y: position.y },
+        velocity: {
+          vx: Math.random() * 200 - 100,
+          vy: Math.random() * 200 - 100,
+        },
+        lifetime,
+        size,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      }))
     }
-    this.ctx.restore()
   }
 
   clear(): void {}

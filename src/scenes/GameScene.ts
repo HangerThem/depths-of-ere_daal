@@ -71,7 +71,7 @@ export class GameScene extends Scene {
     this.systemManager.addSystem(new MovementSystem())
     this.systemManager.addSystem(new InteractionSystem())
     this.systemManager.addSystem(new CollisionSystem())
-    this.systemManager.addSystem(new ParticleSystem(this.ctx!!))
+    this.systemManager.addSystem(new ParticleSystem())
     this.systemManager.addSystem(new CombatSystem())
     this.systemManager.addSystem(new CameraSystem())
     this.systemManager.addSystem(new SoundSystem())

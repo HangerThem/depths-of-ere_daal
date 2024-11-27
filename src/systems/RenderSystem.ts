@@ -10,6 +10,7 @@ import { PhysicsComponent } from "../components/PhysicsComponent.js"
 import { WeaponComponent } from "../components/WeaponComponent.js"
 import { AssetManager } from "../core/AssetManager.js"
 import { CameraComponent } from "../components/CameraComponent.js"
+import { ParticleComponent } from "../components/ParticleComponent.js"
 
 const DEBUG_COLLISIONS = false
 
@@ -270,6 +271,9 @@ export class RenderSystem extends System {
         this.ctx.restore()
       }
 
+      const particles = components.getComponents(ParticleComponent)
+      particles && this.renderParticles(particles)
+
       this.ctx.restore()
     }
 
@@ -310,6 +314,29 @@ export class RenderSystem extends System {
         button.bounds.x + button.bounds.width / 2,
         button.bounds.y + button.bounds.height / 2
       )
+    }
+  }
+
+  private renderParticles(particles: Map<number, ParticleComponent>) {
+    for (const [entityId, particle] of particles) {
+      const entity = this.entityMap.get(entityId)
+      if (!entity) continue
+
+      this.ctx.save()
+      this.ctx.globalAlpha = particle.lifetime / 20
+      this.ctx.fillStyle = particle.color
+      this.ctx.translate(
+        particle.position.x + particle.size / 2,
+        particle.position.y + particle.size / 2
+      )
+      this.ctx.rotate(particle.rotation)
+      this.ctx.fillRect(
+        particle.position.x,
+        particle.position.y,
+        particle.size,
+        particle.size
+      )
+      this.ctx.restore()
     }
   }
 
